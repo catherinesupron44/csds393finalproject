@@ -1,5 +1,5 @@
 {
-  "name": "searchowl-website",
+  "name": "BetBuddy",
   "version": "2.0.0",
   "type": "module",
   "private": true,
@@ -7,11 +7,13 @@
     "allowedHosts": [
       "localhost",
       ".localhost"
-    ],
-    "proxy": "https://localhost:5000/"
+    ]
   },
   "dependencies": {
+    "@babel/runtime": "^7.25.7",
     "framer-motion": "^11.11.9",
+    "lucide-react": "^0.453.0",
+    "next": "^14.2.15",
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^6.27.0",
