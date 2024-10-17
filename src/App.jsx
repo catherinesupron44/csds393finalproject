@@ -4,6 +4,7 @@ import { AnimatePresence } from "framer-motion";
 
 
 import HomePage from './components/homepage';
+import FriendsPage from './components/friends';
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
             <AnimatePresence>
                 <Routes>
                 <Route path="" element={<HomePage />} />
+                <Route path="/friends" element={<FriendsPage />} />
                 </Routes>
             </AnimatePresence>
         </Router>
