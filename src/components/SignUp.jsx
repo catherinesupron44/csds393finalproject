@@ -50,7 +50,7 @@ export default function SignUp() {
         }
       });
      
-      navigate("/confirmation", {state: {email: email}});
+      navigate("/home", {state: {email: email}});
   
       
     
