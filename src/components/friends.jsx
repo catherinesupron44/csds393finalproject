@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Users, UserPlus, Trophy, Home, TrendingUp, User, DollarSign } from 'lucide-react';
-import  '../pages/friends.css';
+import Link from "next/link"
 
 export default function GroupsPage() {
   const [inGroup, setInGroup] = useState(false);
@@ -28,88 +31,101 @@ export default function GroupsPage() {
   };
 
   return (
-    <div className="container">
-      <div className="content">
-        <h1 className="title">Groups</h1>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Groups</h1>
         {!inGroup ? (
-          <div className="buttonContainer">
-            <button className="button" onClick={() => setShowJoinModal(true)}>
-              <Users size={24} />
-              Join a Group
-            </button>
-            <button className="button" onClick={() => setShowCreateModal(true)}>
-              <UserPlus size={24} />
-              Create a Group
-            </button>
+          <div className="space-y-4">
+            <Dialog open={showJoinModal} onOpenChange={setShowJoinModal}>
+              <DialogTrigger asChild>
+                <Button className="w-full justify-start" variant="outline">
+                  <Users className="mr-2 h-4 w-4" />
+                  Join a Group
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Join a Group</DialogTitle>
+                </DialogHeader>
+                <Input placeholder="Enter group code" className="mt-4" />
+                <Button onClick={handleJoinGroup} className="mt-4">Join</Button>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+              <DialogTrigger asChild>
+                <Button className="w-full justify-start" variant="outline">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Create a Group
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create a Group</DialogTitle>
+                </DialogHeader>
+                <Input placeholder="Enter group ID" className="mt-4" />
+                <Button onClick={handleCreateGroup} className="mt-4">Create</Button>
+              </DialogContent>
+            </Dialog>
           </div>
         ) : (
-          <div className="leaderboard">
-            <h2 className="leaderboardTitle">
-              <Trophy size={24} />
+          <div className="bg-card rounded-lg shadow p-6">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center">
+              <Trophy className="mr-2 h-6 w-6" />
               Leaderboard
             </h2>
-            <table className="leaderboardTable">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Name</th>
-                  <th>Points</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Rank</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Points</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {leaderboardData.map((user) => (
-                  <tr key={user.rank}>
-                    <td>{user.rank}</td>
-                    <td>{user.name}</td>
-                    <td>{user.points}</td>
-                  </tr>
+                  <TableRow key={user.rank}>
+                    <TableCell>{user.rank}</TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.points}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         )}
-      </div>
-
-      <nav className="navigation">
-        <Link to="/" className="navItem">
-          <Home size={24} />
-          <span>Home</span>
+      </main>
+      <nav className="fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around py-2">
+        <Link href="/" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <Home className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Home</span>
         </Link>
-        <Link to="/friends" className="navItem">
-          <Users size={24} />
-          <span>Friends</span>
+        <Link href="/groups" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <Users className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Groups</span>
         </Link>
-        <Link to="/markets" className="navItem">
-          <TrendingUp size={24} />
-          <span>Markets</span>
+        <Link href="/markets" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <TrendingUp className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Markets</span>
         </Link>
-        <Link to="/wallet" className="navItem">
-          <DollarSign size={24} />
-          <span>Wallet</span>
+        <Link href="/wallet" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <DollarSign className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Wallet</span>
         </Link>
-        <Link to="/profile" className="navItem">
-          <User size={24} />
-          <span>Profile</span>
+        <Link href="/profile" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <User className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Profile</span>
         </Link>
       </nav>
-
-      {showJoinModal && (
-        <div className="modal">
-          <h2>Join a Group</h2>
-          <input type="text" placeholder="Enter group code" className="input" />
-          <button className="button" onClick={handleJoinGroup}>Join</button>
-          <button className="button" onClick={() => setShowJoinModal(false)}>Cancel</button>
-        </div>
-      )}
-
-      {showCreateModal && (
-        <div className="modal">
-          <h2>Create a Group</h2>
-          <input type="text" placeholder="Enter group ID" className="input" />
-          <button className="button" onClick={handleCreateGroup}>Create</button>
-          <button className="button" onClick={() => setShowCreateModal(false)}>Cancel</button>
-        </div>
-      )}
     </div>
-  );
+  )
 }
