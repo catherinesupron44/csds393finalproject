@@ -1,0 +1,7 @@
+{
+    "AppSyncApiName": "csds393finalproject",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "S3DeploymentBucket": "amplify-csds393finalproject-dev-2fe48-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/df2795d2b8684d3c58f41db6f3b20e0b33f90825"
+}
