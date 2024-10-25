@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { Home, Users, TrendingUp, User, DollarSign } from 'lucide-react';
 import { getCurrentUser, fetchUserAttributes, signOut } from "aws-amplify/auth";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import '../pages/homepage.css';
 
 export default function HomePage() {
