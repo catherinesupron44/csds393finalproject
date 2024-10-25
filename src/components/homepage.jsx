@@ -1,10 +1,34 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import { Home, Users, TrendingUp, User, DollarSign } from 'lucide-react';
+import { getCurrentUser, fetchUserAttributes, signOut } from "aws-amplify/auth";
 import '../pages/homepage.css';
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('home');
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
+
+  const fetchCurrentUser = async () => {
+    try {
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  fetchCurrentUser();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      console.log('success');
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   //hard coded need to change
   const bets = [
@@ -33,7 +57,7 @@ export default function HomePage() {
 
       <nav className="navigation">
         <Link 
-          to="/" 
+          to="/home" 
           className={`navItem ${activeTab === 'home' ? 'active' : ''}`}
           onClick={() => setActiveTab('home')}
         >
@@ -66,8 +90,8 @@ export default function HomePage() {
         </Link>
         <Link 
           to="/profile" 
-          className={`navItem ${activeTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setActiveTab('profile')}
+          className={`navItem ${activeTab === '' ? 'active' : ''}`}
+          onClick={handleSignOut}
         >
           <User size={24} />
           <span>Profile</span>
