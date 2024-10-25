@@ -1,10 +1,34 @@
-import React from 'react';
-import Link from 'next/link'
+import React, { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 import { Home, Users, TrendingUp, User, DollarSign } from 'lucide-react';
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getCurrentUser, fetchUserAttributes, signOut } from "aws-amplify/auth";
+import '../pages/homepage.css';
 
 export default function HomePage() {
+  const [activeTab, setActiveTab] = useState('home');
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
+
+  const fetchCurrentUser = async () => {
+    try {
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  fetchCurrentUser();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      console.log('success');
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
+  };
   //hard coded need to change
   const balance = 1000
   const bets = [
@@ -41,13 +65,14 @@ export default function HomePage() {
           </CardContent>
         </Card>
       </main>
-
-      <nav className="fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around py-2">
-        <Link href="/" className="flex flex-col items-center">
-          <Button variant="ghost" size="sm" className="h-12 px-0">
-            <Home className="h-6 w-6" />
-          </Button>
-          <span className="text-xs">Home</span>
+      <nav className="navigation">
+        <Link 
+          to="/home" 
+          className={`navItem ${activeTab === 'home' ? 'active' : ''}`}
+          onClick={() => setActiveTab('home')}
+        >
+          <Home size={24} />
+          <span>Home</span>
         </Link>
         <Link href="/friends" className="flex flex-col items-center">
           <Button variant="ghost" size="sm" className="h-12 px-0">
@@ -67,11 +92,13 @@ export default function HomePage() {
           </Button>
           <span className="text-xs">Wallet</span>
         </Link>
-        <Link href="/profile" className="flex flex-col items-center">
-          <Button variant="ghost" size="sm" className="h-12 px-0">
-            <User className="h-6 w-6" />
-          </Button>
-          <span className="text-xs">Profile</span>
+        <Link 
+          to="/profile" 
+          className={`navItem ${activeTab === '' ? 'active' : ''}`}
+          onClick={handleSignOut}
+        >
+          <User size={24} />
+          <span>Profile</span>
         </Link>
       </nav>
     </div>
