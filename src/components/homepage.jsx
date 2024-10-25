@@ -29,8 +29,8 @@ export default function HomePage() {
       console.log(err);
     }
   };
-
   //hard coded need to change
+  const balance = 1000
   const bets = [
     { id: 'A', name: 'Bet A', odds: '1.5' },
     { id: 'B', name: 'Bet B', odds: '2.0' },
@@ -38,23 +38,33 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="container">
-      <div className="content">
-        <div className="betsContainer">
-        <div className="balance">
-            <span>$</span>
-            <span>Total Balance</span>
-          </div>
-          <h2>Active Markets</h2>
-          {bets.map((bet) => (
-            <div key={bet.id} className="betItem">
-              <span className="betId">{bet.name}</span>
-              <span className="betOdds">{bet.odds}</span>
-            </div>
-          ))}    
-        </div>
-      </div>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Total Balance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold">${balance.toFixed(2)}</p>
+          </CardContent>
+        </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Markets</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {bets.map((bet) => (
+                <li key={bet.id} className="flex justify-between items-center p-2 bg-muted rounded-lg">
+                  <span className="font-medium">{bet.name}</span>
+                  <span className="text-muted-foreground">Odds: {bet.odds}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </main>
       <nav className="navigation">
         <Link 
           to="/home" 
@@ -64,29 +74,23 @@ export default function HomePage() {
           <Home size={24} />
           <span>Home</span>
         </Link>
-        <Link 
-          to="/friends" 
-          className={`navItem ${activeTab === 'friends' ? 'active' : ''}`}
-          onClick={() => setActiveTab('friends')}
-        >
-          <Users size={24} />
-          <span>Friends</span>
+        <Link href="/friends" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <Users className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Friends</span>
         </Link>
-        <Link 
-          to="/markets" 
-          className={`navItem ${activeTab === 'markets' ? 'active' : ''}`}
-          onClick={() => setActiveTab('markets')}
-        >
-          <TrendingUp size={24} />
-          <span>Markets</span>
+        <Link href="/markets" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <TrendingUp className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Markets</span>
         </Link>
-        <Link 
-          to="/wallet" 
-          className={`navItem ${activeTab === 'wallet' ? 'active' : ''}`}
-          onClick={() => setActiveTab('wallet')}
-        >
-          <DollarSign size={24} />
-          <span>Wallet</span>
+        <Link href="/wallet" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="h-12 px-0">
+            <DollarSign className="h-6 w-6" />
+          </Button>
+          <span className="text-xs">Wallet</span>
         </Link>
         <Link 
           to="/profile" 
@@ -98,5 +102,5 @@ export default function HomePage() {
         </Link>
       </nav>
     </div>
-  );
+  )
 }
