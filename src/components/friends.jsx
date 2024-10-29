@@ -71,7 +71,7 @@ export default function GroupsPage() {
       </div>
 
       <nav className="navigation">
-        <Link to="/" className="navItem">
+        <Link to="/home" className="navItem">
           <Home size={24} />
           <span>Home</span>
         </Link>
@@ -87,7 +87,7 @@ export default function GroupsPage() {
           <DollarSign size={24} />
           <span>Wallet</span>
         </Link>
-        <Link to="/profile" className="navItem">
+        <Link to="/" className="navItem">
           <User size={24} />
           <span>Profile</span>
         </Link>

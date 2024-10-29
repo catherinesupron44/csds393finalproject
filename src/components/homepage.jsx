@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { Home, Users, TrendingUp, User, DollarSign } from 'lucide-react';
-import { getCurrentUser, fetchUserAttributes, signOut } from "aws-amplify/auth";
+import { getCurrentUser, signOut } from "aws-amplify/auth";
 import '../pages/homepage.css';
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState('home');
   const [currentUser, setCurrentUser] = useState(null);
+  const [isActive, setActive] = useState(false);
   const navigate = useNavigate();
 
-  const fetchCurrentUser = async () => {
-    try {
-      const user = await getCurrentUser();
-      setCurrentUser(user);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-  fetchCurrentUser();
+    fetchCurrentUser();
+  }, []); // empty dependency array to run only on mount
+
+  const handleToggle = () => {
+    setActive(!isActive);
+    document.body.classList.toggle("overflow-hidden", !isActive);
+  };
 
   const handleSignOut = async () => {
     try {
@@ -30,7 +37,6 @@ export default function HomePage() {
     }
   };
 
-  //hard coded need to change
   const bets = [
     { id: 'A', name: 'Bet A', odds: '1.5' },
     { id: 'B', name: 'Bet B', odds: '2.0' },
@@ -41,7 +47,7 @@ export default function HomePage() {
     <div className="container">
       <div className="content">
         <div className="betsContainer">
-        <div className="balance">
+          <div className="balance">
             <span>$</span>
             <span>Total Balance</span>
           </div>
@@ -56,43 +62,23 @@ export default function HomePage() {
       </div>
 
       <nav className="navigation">
-        <Link 
-          to="/home" 
-          className={`navItem ${activeTab === 'home' ? 'active' : ''}`}
-          onClick={() => setActiveTab('home')}
-        >
+        <Link to="/home" className="navItem">
           <Home size={24} />
           <span>Home</span>
         </Link>
-        <Link 
-          to="/friends" 
-          className={`navItem ${activeTab === 'friends' ? 'active' : ''}`}
-          onClick={() => setActiveTab('friends')}
-        >
+        <Link to="/friends" className="navItem">
           <Users size={24} />
           <span>Friends</span>
         </Link>
-        <Link 
-          to="/markets" 
-          className={`navItem ${activeTab === 'markets' ? 'active' : ''}`}
-          onClick={() => setActiveTab('markets')}
-        >
+        <Link to="/markets" className="navItem">
           <TrendingUp size={24} />
           <span>Markets</span>
         </Link>
-        <Link 
-          to="/wallet" 
-          className={`navItem ${activeTab === 'wallet' ? 'active' : ''}`}
-          onClick={() => setActiveTab('wallet')}
-        >
+        <Link to="/wallet" className="navItem">
           <DollarSign size={24} />
           <span>Wallet</span>
         </Link>
-        <Link 
-          to="/profile" 
-          className={`navItem ${activeTab === '' ? 'active' : ''}`}
-          onClick={handleSignOut}
-        >
+        <Link to="/" className="navItem" onClick={handleSignOut}>
           <User size={24} />
           <span>Profile</span>
         </Link>
