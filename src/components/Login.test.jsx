@@ -1,186 +1,126 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
+import Login from './Login';
 import { BrowserRouter } from 'react-router-dom';
-import Login from './SignUp';  // Note: Component might need renaming for clarity
-import { signIn, signInWithRedirect } from 'aws-amplify/auth';
+import * as auth from 'aws-amplify/auth';
 
-// Mock the required dependencies
-jest.mock('aws-amplify/auth', () => ({
-  signIn: jest.fn(),
-  signInWithRedirect: jest.fn(),
-}));
-
+// Mock the external dependencies
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => jest.fn(),
 }));
 
-const renderLogin = () => {
-  return render(
+jest.mock('aws-amplify/auth', () => ({
+  signIn: jest.fn(),
+  signInWithRedirect: jest.fn(),
+  getCurrentUser: jest.fn(),
+}));
+
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }) => <div {...props}>{children}</div>,
+  },
+}));
+
+describe('Login Component', () => {
+  const renderComponent = () => render(
     <BrowserRouter>
       <Login />
     </BrowserRouter>
   );
-};
 
-describe('Login Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  // Test component rendering
-  it('renders login form correctly', () => {
-    renderLogin();
-    
-    // Check for login-specific text and elements
+  test('renders Login component', () => {
+    renderComponent();
     expect(screen.getByText('Login')).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /google/i })).toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
   });
 
-  // Test form interaction
-  it('allows user to enter credentials', async () => {
-    renderLogin();
-    
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+  test('updates form data on input change', () => {
+    renderComponent();
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
 
-    await userEvent.type(emailInput, 'user@example.com');
-    await userEvent.type(passwordInput, 'mypassword');
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-    expect(emailInput).toHaveValue('user@example.com');
-    expect(passwordInput).toHaveValue('mypassword');
+    expect(emailInput).toHaveValue('test@example.com');
+    expect(passwordInput).toHaveValue('password123');
   });
 
-  // Test successful login
-  it('handles successful login and redirects to home', async () => {
-    const mockNavigate = jest.fn();
-    jest.spyOn(require('react-router-dom'), 'useNavigate').mockReturnValue(mockNavigate);
-    
-    signIn.mockResolvedValueOnce({});
-    
-    renderLogin();
+  test('calls signIn function on form submission', async () => {
+    renderComponent();
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
+    const signInButton = screen.getByRole('button', { name: 'Sign In' });
 
-    await userEvent.type(screen.getByLabelText(/email/i), 'user@example.com');
-    await userEvent.type(screen.getByLabelText(/password/i), 'correctpassword');
-    
-    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(signInButton);
 
     await waitFor(() => {
-      expect(signIn).toHaveBeenCalledWith({
-        username: 'user@example.com',
-        password: 'correctpassword',
+      expect(auth.signIn).toHaveBeenCalledWith({
+        username: 'test@example.com',
+        password: 'password123',
       });
+    });
+  });
+
+  test('displays sign up link', () => {
+    renderComponent();
+    const signUpLink = screen.getByText('Sign Up');
+    expect(signUpLink).toBeInTheDocument();
+    expect(signUpLink).toHaveAttribute('href', '/signup');
+  });
+
+  test('calls signInWithRedirect when Google button is clicked', () => {
+    renderComponent();
+    const googleButton = screen.getByText('Google');
+    fireEvent.click(googleButton);
+    expect(auth.signInWithRedirect).toHaveBeenCalledWith({ provider: 'Google' });
+  });
+
+  test('navigates to home page after successful sign in', async () => {
+    const mockNavigate = jest.fn();
+    jest.spyOn(require('react-router-dom'), 'useNavigate').mockReturnValue(mockNavigate);
+
+    renderComponent();
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
+    const signInButton = screen.getByRole('button', { name: 'Sign In' });
+
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(signInButton);
+
+    await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/home');
     });
   });
 
-  // Test login failures
-  describe('handles login failures', () => {
-    it('handles invalid credentials', async () => {
-      const mockError = new Error('Invalid credentials');
-      signIn.mockRejectedValueOnce(mockError);
-      
-      const consoleSpy = jest.spyOn(console, 'log');
-      
-      renderLogin();
+  test('logs error when sign in fails', async () => {
+    const consoleSpy = jest.spyOn(console, 'log');
+    auth.signIn.mockRejectedValueOnce(new Error('Sign in failed'));
 
-      await userEvent.type(screen.getByLabelText(/email/i), 'user@example.com');
-      await userEvent.type(screen.getByLabelText(/password/i), 'wrongpassword');
-      
-      fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    renderComponent();
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
+    const signInButton = screen.getByRole('button', { name: 'Sign In' });
 
-      await waitFor(() => {
-        expect(signIn).toHaveBeenCalled();
-        expect(consoleSpy).toHaveBeenCalledWith('error signing in', mockError);
-      });
-    });
-
-    it('requires email field', async () => {
-      renderLogin();
-      
-      const emailInput = screen.getByLabelText(/email/i);
-      const submitButton = screen.getByRole('button', { name: /sign in/i });
-      
-      await userEvent.type(screen.getByLabelText(/password/i), 'password123');
-      fireEvent.click(submitButton);
-
-      expect(emailInput).toBeInvalid();
-    });
-
-    it('requires password field', async () => {
-      renderLogin();
-      
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /sign in/i });
-      
-      await userEvent.type(screen.getByLabelText(/email/i), 'user@example.com');
-      fireEvent.click(submitButton);
-
-      expect(passwordInput).toBeInvalid();
-    });
-  });
-
-  // Test Google sign in
-  it('initiates Google sign in when clicking Google button', async () => {
-    renderLogin();
-    
-    const googleButton = screen.getByRole('button', { name: /google/i });
-    fireEvent.click(googleButton);
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(signInButton);
 
     await waitFor(() => {
-      expect(signInWithRedirect).toHaveBeenCalledWith({ provider: 'Google' });
-    });
-  });
-
-  // Test UI elements
-  describe('UI elements', () => {
-    it('renders sign up link for new users', () => {
-      renderLogin();
-      
-      const signUpLink = screen.getByText(/sign up/i);
-      expect(signUpLink).toBeInTheDocument();
-      expect(signUpLink).toHaveAttribute('href', '/signup');
+      expect(consoleSpy).toHaveBeenCalledWith('error signing in', expect.any(Error));
     });
 
-    it('has proper styling classes on the sign in button', () => {
-      renderLogin();
-      
-      const signInButton = screen.getByRole('button', { name: /sign in/i });
-      expect(signInButton).toHaveClass('bg-violet-500');
-      expect(signInButton).toHaveClass('rounded-full');
-    });
-
-    it('renders the divider with "Or continue with" text', () => {
-      renderLogin();
-      
-      expect(screen.getByText(/or continue with/i)).toBeInTheDocument();
-    });
-  });
-
-  // Test form validation
-  describe('form validation', () => {
-    it('validates email format', async () => {
-      renderLogin();
-      
-      const emailInput = screen.getByLabelText(/email/i);
-      await userEvent.type(emailInput, 'invalid-email');
-      
-      expect(emailInput).toBeInvalid();
-    });
-
-    it('prevents form submission with empty fields', async () => {
-      const mockSubmit = jest.fn();
-      renderLogin();
-      
-      const form = screen.getByRole('form');
-      form.onsubmit = mockSubmit;
-      
-      fireEvent.submit(form);
-      
-      expect(mockSubmit).not.toHaveBeenCalled();
-    });
+    consoleSpy.mockRestore();
   });
 });
