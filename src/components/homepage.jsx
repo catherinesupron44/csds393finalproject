@@ -74,9 +74,9 @@ export default function HomePage() {
           <TrendingUp size={24} />
           <span>Markets</span>
         </Link>
-        <Link to="/wallet" className="navItem">
+        <Link to="/history" className="navItem">
           <DollarSign size={24} />
-          <span>Wallet</span>
+          <span>Bet History</span>
         </Link>
         <Link to="/" className="navItem" onClick={handleSignOut}>
           <User size={24} />
