@@ -1,4 +1,4 @@
-import { Menu, Bell, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -38,10 +38,7 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
                 </NavLink>
               </div>
 
-              <div className="hidden md:flex items-center space-x-4">
-                <button className="p-2 rounded-full hover:bg-gray-100">
-                  <Bell className="w-6 h-6 text-gray-600" />
-                </button>
+             <div className="hidden md:flex items-center space-x-4">
                 <Link to="/profile">
                   <button className="p-2 rounded-full hover:bg-gray-100">
                     <User className="w-6 h-6 text-gray-600" />
