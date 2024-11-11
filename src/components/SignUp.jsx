@@ -1,3 +1,4 @@
+//signup
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -43,9 +44,7 @@ export default function SignUp() {
           userAttributes: {
             email: email,
             name: givenName,
-            // Add any other user attributes you want to set
           },
-          // optional
           autoSignIn: true // or SignInOptions e.g { authFlowType: "USER_SRP_AUTH" }
         }
       });
