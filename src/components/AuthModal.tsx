@@ -1,5 +1,15 @@
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { X } from 'lucide-react';
+import { SignInInput, signInWithRedirect} from "aws-amplify/auth";
+import { signUp, signIn } from 'aws-amplify/auth';
+import { useNavigate } from 'react-router-dom';
+
+import { Amplify } from 'aws-amplify';
+import { generateClient } from 'aws-amplify/api';
+import config from '../amplifyconfiguration.json';
+Amplify.configure(config);
+const client = generateClient();
+
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -11,12 +21,74 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setConfirmation] = useState('');
+  const [name, setName] = useState('');
+  
+
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  type FormData = {
+    email: string;
+    newPassword: string;
+    passwordConfirmation: string;
+    givenName: string;
+  };
+  
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    newPassword: '',
+    passwordConfirmation: '',
+    givenName: ''
+  });
+
+  const handleChange = (data: string, value: any) => {
+    setFormData({
+      ...formData,
+      [data]: value,
+    });
+  };
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onLogin(email, password);
+  async function handleSignIn() {
+    const { email, newPassword} = formData;
+    try {
+      const { isSignedIn, nextStep } = await signIn({ username: email, password: newPassword });
+    } catch (error) {
+      console.log('error signing in', error);
+    }
+  }
+
+  const handleSignUp = async () => {
+    const { email, newPassword, givenName, passwordConfirmation } = formData;
+  
+    if (newPassword !== passwordConfirmation) {
+      console.error("Passwords do not match");
+      setError('Error signing up: Passwords do not match');
+      return;
+    }
+  
+    try {
+      await signUp({
+        username: email, // Use the email as the username
+        password: newPassword,
+        options: {
+          userAttributes: {
+            email: email,
+            name: givenName,
+            // Add any other user attributes you want to set
+          },
+          // optional
+          autoSignIn: true // or SignInOptions e.g { authFlowType: "USER_SRP_AUTH" }
+        }
+      });
+  
+      navigate("/dashboard", { state: { email } });
+    } catch (error: any) {
+      console.error('Error signing up:', error);
+      setError(`Error signing up: ${error.message}`);
+    }
   };
 
   return (
@@ -33,15 +105,18 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
           {isSignUp ? 'Create Account' : 'Welcome Back'}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => {
+  e.preventDefault();
+  isSignUp ? handleSignUp() : handleSignIn();
+}} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
@@ -53,12 +128,54 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
             </label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.newPassword}
+              onChange={(e) => handleChange("newPassword", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
           </div>
+
+          {isSignUp && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              value={formData.passwordConfirmation}
+              onChange={(e) => handleChange("passwordConfirmation", e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div> )}
+
+          {isSignUp && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name
+            </label>
+            <input
+              type="name"
+              value={formData.givenName}
+              onChange={(e) => handleChange("givenName", e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div> )}
+
+          {error && (
+            <div className="mt-4 p-3 text-sm text-red-500 bg-red-50 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+            onClick={() => signInWithRedirect({ provider: "Google" })}
+          >
+            Google
+          </button>
 
           <button
             type="submit"

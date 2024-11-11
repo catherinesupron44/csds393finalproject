@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from './lib/store';
 import Navbar from './components/Navbar';
 import AuthModal from './components/AuthModal';
 import Dashboard from './pages/Dashboard';
@@ -9,49 +8,48 @@ import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 import Landing from './pages/Landing';
 import { useState } from 'react';
+import ProtectedRoutes from "./utils/ProtectedRoutes";
+import { signIn } from 'aws-amplify/auth';
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const { isAuthenticated, login } = useAuthStore();
 
   const handleLogin = async (email: string, password: string) => {
-    await login(email, password);
-    setIsAuthModalOpen(false);
+    try {
+      await signIn({ username: email, password });
+      setIsAuthModalOpen(false);
+    } catch (error) {
+      console.error('Error signing in:', error);
+      // Handle error (show error message, etc.)
+    }
   };
 
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100">
         <Navbar 
-          isAuthenticated={isAuthenticated} 
           onAuthClick={() => setIsAuthModalOpen(true)}
         />
         
         <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<Landing onGetStarted={() => setIsAuthModalOpen(true)} />} />
           <Route 
             path="/" 
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Landing onGetStarted={() => setIsAuthModalOpen(true)} />} 
+            element={<Landing onGetStarted={() => setIsAuthModalOpen(true)} />}
           />
-          <Route 
-            path="/dashboard" 
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} 
-          />
-          <Route 
-            path="/bets" 
-            element={isAuthenticated ? <Bets /> : <Navigate to="/" />} 
-          />
-          <Route 
-            path="/groups" 
-            element={isAuthenticated ? <Groups /> : <Navigate to="/" />} 
-          />
-          <Route 
-            path="/leaderboard" 
-            element={isAuthenticated ? <Leaderboard /> : <Navigate to="/" />} 
-          />
-          <Route 
-            path="/profile" 
-            element={isAuthenticated ? <Profile /> : <Navigate to="/" />} 
-          />
+
+          {/* Protected routes */}
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/bets" element={<Bets />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
         <AuthModal 
