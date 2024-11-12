@@ -5,7 +5,6 @@ interface Profile {
   username: string;
   email: string;
   coins: number;
-  badges: string[];
   groupIds: string[];
   profileIcon: string;
 }
@@ -30,7 +29,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         username: 'demo_user',
         email,
         coins: 1000,
-        badges: ['early_adopter', 'bet_master'],
         groupIds: ['1', '2'],
         profileIcon: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo_user',
       },

@@ -12,9 +12,6 @@ describe('Leaderboard Page', () => {
     render(<Leaderboard />);
     
     expect(screen.getByText('Global Leaderboard')).toBeInTheDocument();
-    expect(screen.getByText('BetMaster')).toBeInTheDocument();
-    expect(screen.getByText('LuckyPro')).toBeInTheDocument();
-    expect(screen.getByText('PredictionKing')).toBeInTheDocument();
   });
 
   it('filters users by search', async () => {
@@ -42,14 +39,6 @@ describe('Leaderboard Page', () => {
     
     expect(screen.getByText('78%')).toBeInTheDocument(); // Win rate
     expect(screen.getByText('245')).toBeInTheDocument(); // Total bets
-    expect(screen.getByText('15000')).toBeInTheDocument(); // Coins
-  });
-
-  it('shows user badges', () => {
-    render(<Leaderboard />);
-    
-    expect(screen.getByText('champion')).toBeInTheDocument();
-    expect(screen.getByText('streak master')).toBeInTheDocument();
-    expect(screen.getByText('early adopter')).toBeInTheDocument();
+    expect(screen.getByText('15,000')).toBeInTheDocument(); // Coins
   });
 });

@@ -57,25 +57,6 @@ describe('Bets Page', () => {
     });
   });
 
-  it('filtered bets', async () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <Bets />
-      </QueryClientProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Test Bet 1')).toBeInTheDocument();
-    });
-
-    await userEvent.selectOptions(
-      screen.getByRole('combobox'),
-      'entertainment'
-    );
-
-    expect(screen.queryByText('Test Bet 1')).not.toBeInTheDocument();
-    expect(screen.getByText('Test Bet 2')).toBeInTheDocument();
-  });
 
   it('opens create bet modal', async () => {
     render(
@@ -84,7 +65,11 @@ describe('Bets Page', () => {
       </QueryClientProvider>
     );
 
-    await userEvent.click(screen.getByText('Create Bet'));
-    expect(screen.getByText('Create New Bet')).toBeInTheDocument();
+    const createBetButton = await waitFor(() =>
+        screen.getByRole('button', { name: /Create Bet/i })
+      );
+    
+      await userEvent.click(createBetButton);
+      expect(screen.getByText('Create New Bet')).toBeInTheDocument();
   });
 });

@@ -8,7 +8,6 @@ interface LeaderboardEntry {
   winRate: number;
   totalBets: number;
   coins: number;
-  badges: string[];
 }
 
 const MOCK_LEADERBOARD: LeaderboardEntry[] = [
@@ -18,8 +17,7 @@ const MOCK_LEADERBOARD: LeaderboardEntry[] = [
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=BetMaster",
     winRate: 78,
     totalBets: 245,
-    coins: 15000,
-    badges: ["champion", "streak_master", "early_adopter"]
+    coins: 15000
   },
   {
     rank: 2,
@@ -27,8 +25,7 @@ const MOCK_LEADERBOARD: LeaderboardEntry[] = [
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=LuckyPro",
     winRate: 72,
     totalBets: 189,
-    coins: 12500,
-    badges: ["high_roller", "consistent"]
+    coins: 12500
   },
   {
     rank: 3,
@@ -36,8 +33,7 @@ const MOCK_LEADERBOARD: LeaderboardEntry[] = [
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=PredictionKing",
     winRate: 70,
     totalBets: 203,
-    coins: 11000,
-    badges: ["analyst", "streak_master"]
+    coins: 11000
   }
 ];
 
@@ -92,7 +88,6 @@ export default function Leaderboard() {
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Win Rate</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Total Bets</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Coins</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">Badges</th>
               </tr>
             </thead>
             <tbody>
@@ -127,16 +122,6 @@ export default function Leaderboard() {
                   <td className="px-4 py-4">{entry.totalBets}</td>
                   <td className="px-4 py-4">{entry.coins.toLocaleString()}</td>
                   <td className="px-4 py-4">
-                    <div className="flex gap-1">
-                      {entry.badges.map((badge) => (
-                        <span
-                          key={badge}
-                          className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full"
-                        >
-                          {badge.replace('_', ' ')}
-                        </span>
-                      ))}
-                    </div>
                   </td>
                 </tr>
               ))}

@@ -90,6 +90,7 @@ export default function Profile() {
               <div className="flex items-center justify-center md:justify-start mb-2">
                 <h2 className="text-2xl font-bold">{profile.username}</h2>
                 <button
+                  aria-label = "Edit Username"
                   onClick={() => setIsEditing(true)}
                   className="ml-2 p-1 text-gray-400 hover:text-gray-600"
                 >

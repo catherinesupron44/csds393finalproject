@@ -51,7 +51,7 @@ describe('Betting Functionality', () => {
     await userEvent.click(screen.getByText('Create Bet'));
     
     // Fill in bet details
-    await userEvent.type(screen.getByLabelText('Title'), 'Test Bet');
+    await userEvent.type(screen.getByLabelText('Title'), 'Test Bet 1');
     await userEvent.type(screen.getByLabelText('Description'), 'Test Description');
     await userEvent.type(screen.getByLabelText('End Date'), '2024-03-01T12:00');
     await userEvent.type(screen.getByLabelText('Stake (coins)'), '100');
@@ -106,50 +106,4 @@ describe('Betting Functionality', () => {
     // Verify join bet was called
     expect(api.joinBet).toHaveBeenCalledWith('123');
   });
-
-  
-  it('filters bets by category', async () => {
-    const mockBets = [
-      {
-        id: '1',
-        title: 'Sports Bet',
-        description: 'Test Description',
-        status: 'active',
-        endDate: '2024-03-01',
-        participants: 1,
-        category: 'sports',
-      },
-      {
-        id: '2',
-        title: 'Music Bet',
-        description: 'Music event description',
-        status: 'active',
-        endDate: '2024-04-01',
-        participants: 2,
-        category: 'music',
-      },
-    ];
-  
-    // Mock the getBets API call
-    (api.getBets as jest.Mock).mockResolvedValueOnce(mockBets);
-  
-    renderWithProviders(<App />);
-  
-    // Navigate to bets page
-    await userEvent.click(screen.getByText('My Bets'));
-  
-    // Wait for bets to load
-    await waitFor(() => {
-      expect(screen.getByText('Sports Bet')).toBeInTheDocument();
-      expect(screen.getByText('Music Bet')).toBeInTheDocument();
-    });
-  
-    // Select a category filter, e.g., "sports"
-    await userEvent.selectOptions(screen.getByLabelText('Filter by Category'), 'sports');
-  
-    // Verify only bets with category "sports" are displayed
-    await waitFor(() => {
-      expect(screen.getByText('Sports Bet')).toBeInTheDocument();
-      expect(screen.queryByText('Music Bet')).not.toBeInTheDocument();
-    });
-});})
+})

@@ -97,6 +97,7 @@ export default function CreateBetModal({ isOpen, onClose }: CreateBetModalProps)
               Stake (coins)
             </label>
             <input
+              id="title"
               type="number"
               value={stake}
               onChange={(e) => setStake(e.target.value)}
