@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
 import App from '../../App';
@@ -18,9 +17,7 @@ const queryClient = new QueryClient({
 const renderWithProviders = (ui: React.ReactElement) => {
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {ui}
-      </BrowserRouter>
+      {ui}
     </QueryClientProvider>
   );
 };
@@ -110,6 +107,7 @@ describe('Betting Functionality', () => {
     expect(api.joinBet).toHaveBeenCalledWith('123');
   });
 
+  
   it('filters bets by category', async () => {
     const mockBets = [
       {
@@ -118,9 +116,40 @@ describe('Betting Functionality', () => {
         description: 'Test Description',
         status: 'active',
         endDate: '2024-03-01',
-        participants: 1
-      }
-    ]
-})});
-
-//need to read mockBets value
+        participants: 1,
+        category: 'sports',
+      },
+      {
+        id: '2',
+        title: 'Music Bet',
+        description: 'Music event description',
+        status: 'active',
+        endDate: '2024-04-01',
+        participants: 2,
+        category: 'music',
+      },
+    ];
+  
+    // Mock the getBets API call
+    (api.getBets as jest.Mock).mockResolvedValueOnce(mockBets);
+  
+    renderWithProviders(<App />);
+  
+    // Navigate to bets page
+    await userEvent.click(screen.getByText('My Bets'));
+  
+    // Wait for bets to load
+    await waitFor(() => {
+      expect(screen.getByText('Sports Bet')).toBeInTheDocument();
+      expect(screen.getByText('Music Bet')).toBeInTheDocument();
+    });
+  
+    // Select a category filter, e.g., "sports"
+    await userEvent.selectOptions(screen.getByLabelText('Filter by Category'), 'sports');
+  
+    // Verify only bets with category "sports" are displayed
+    await waitFor(() => {
+      expect(screen.getByText('Sports Bet')).toBeInTheDocument();
+      expect(screen.queryByText('Music Bet')).not.toBeInTheDocument();
+    });
+});})

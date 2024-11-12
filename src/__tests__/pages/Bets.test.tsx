@@ -57,7 +57,7 @@ describe('Bets Page', () => {
     });
   });
 
-  it('filters bets by category', async () => {
+  it('filtered bets', async () => {
     render(
       <QueryClientProvider client={queryClient}>
         <Bets />

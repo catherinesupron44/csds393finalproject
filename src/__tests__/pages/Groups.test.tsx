@@ -99,7 +99,8 @@ describe('Groups Page', () => {
       </QueryClientProvider>
     );
 
-    await userEvent.click(screen.getByText('Create Group'));
-    expect(screen.getByText('Create New Group')).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId('create-group-button'));
+    const modalText = await screen.findByText('Create New Group');
+    expect(modalText).toBeInTheDocument();
   });
 });
