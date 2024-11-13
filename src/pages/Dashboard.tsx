@@ -1,10 +1,6 @@
 import { Trophy, Users, PlusCircle, History } from 'lucide-react';
-import { useAuthStore } from '../lib/store';
 
 export default function Dashboard() {
-  const { profile } = useAuthStore();
-
-  if (!profile) return null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -18,7 +14,7 @@ export default function Dashboard() {
         <StatCard
           icon={<Users className="w-6 h-6 text-blue-600" />}
           title="Active Groups"
-          value={profile.groupIds.length.toString()}
+          value= "1"
           trend="2 new this week"
         />
         <StatCard
