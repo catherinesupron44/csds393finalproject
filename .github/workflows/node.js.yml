@@ -34,8 +34,6 @@ jobs:
       env:
         CI: false 
       run: npm run build --if-present
-    - name: Barecheck - Code Coverage
-      uses: barecheck/code-coverage-action@v1.0.0
     - name: Run tests and generate JSON report
       run: |
         npm run test -- --json --outputFile=test-report.json
