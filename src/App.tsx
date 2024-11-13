@@ -10,6 +10,8 @@ import Landing from './pages/Landing';
 import { useState } from 'react';
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { signIn } from 'aws-amplify/auth';
+import './awsConfig';
+
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -62,4 +64,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; 
