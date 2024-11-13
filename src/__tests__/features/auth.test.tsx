@@ -1,25 +1,20 @@
-import { render, screen} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import App from '../../App';
 import { useAuthStore } from '../../lib/store';
 
-const renderWithRouter = (ui: React.ReactElement) => {
-  return render(
-    <BrowserRouter>
-      {ui}
-    </BrowserRouter>
-  );
+const renderApp = (ui: React.ReactElement) => {
+  return render(ui); // Remove BrowserRouter wrapper, assuming App already handles routing.
 };
 
 describe('Authentication Flow', () => {
   beforeEach(() => {
-    useAuthStore.getState().logout();
+    useAuthStore.getState().logout();  // Ensure clean state before each test
   });
 
   it('shows login modal when clicking sign in button', async () => {
-    renderWithRouter(<App />);
+    renderApp(<App />);
     
     await userEvent.click(screen.getByText('Sign In'));
     
@@ -29,7 +24,7 @@ describe('Authentication Flow', () => {
   });
 
   it('handles successful login flow', async () => {
-    renderWithRouter(<App />);
+    renderApp(<App />);
     
     // Open login modal
     await userEvent.click(screen.getByText('Sign In'));
@@ -47,7 +42,7 @@ describe('Authentication Flow', () => {
   });
 
   it('handles sign up flow', async () => {
-    renderWithRouter(<App />);
+    renderApp(<App />);
     
     // Open login modal
     await userEvent.click(screen.getByText('Sign In'));
@@ -67,7 +62,7 @@ describe('Authentication Flow', () => {
   });
 
   it('redirects to dashboard after login', async () => {
-    renderWithRouter(<App />);
+    renderApp(<App />);
     
     await userEvent.click(screen.getByText('Sign In'));
     await userEvent.type(screen.getByLabelText('Email'), 'test@example.com');
@@ -76,4 +71,42 @@ describe('Authentication Flow', () => {
     
     expect(window.location.pathname).toBe('/dashboard');
   });
+
+  it('displays error on failed login attempt', async () => {
+    renderApp(<App />);
+    
+    // Open login modal
+    await userEvent.click(screen.getByText('Sign In'));
+    
+    // Fill in incorrect credentials
+    await userEvent.type(screen.getByLabelText('Email'), 'wrong@example.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'wrongpassword');
+    
+    // Submit form
+    await userEvent.click(screen.getByRole('button', { name: 'Sign In' }));
+    
+    // Verify error message is shown
+    expect(screen.getByText('Invalid email or password')).toBeInTheDocument();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it('displays error on failed signup attempt with existing email', async () => {
+    renderApp(<App />);
+    
+    // Open login modal and switch to sign up
+    await userEvent.click(screen.getByText('Sign In'));
+    await userEvent.click(screen.getByText("Don't have an account? Sign up"));
+    
+    // Fill in an email that's already registered
+    await userEvent.type(screen.getByLabelText('Email'), 'test@example.com');  // Assume this email already exists
+    await userEvent.type(screen.getByLabelText('Password'), 'password123');
+    
+    // Submit form
+    await userEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
+    
+    // Verify error message is shown
+    expect(screen.getByText('Email already exists')).toBeInTheDocument();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
 });
