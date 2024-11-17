@@ -1,6 +1,5 @@
 import { Trophy, Users, PlusCircle, History } from 'lucide-react';
-import Navbar from '../components/Navbar.tsx';
-import GetActiveBets from "../components/GetActiveBets.jsx";
+import GetActiveMarkets from "../components/GetActiveMarkets.jsx";
 
 export default function Dashboard() {
 
@@ -37,13 +36,13 @@ export default function Dashboard() {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Active Bets</h2>
+              <h2 className="text-xl font-semibold">Active Markets</h2>
               <button className="text-indigo-600 hover:text-indigo-700 font-medium">
                 View All
               </button>
             </div>
             <div className="space-y-4">
-              <GetActiveBets />
+              <GetActiveMarkets />
             </div>
           </div>
         </div>

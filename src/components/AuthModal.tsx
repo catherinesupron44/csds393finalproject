@@ -1,7 +1,6 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { X } from 'lucide-react';
-import { SignInInput, signInWithRedirect} from "aws-amplify/auth";
-import { signUp, signIn } from 'aws-amplify/auth';
+import { signUp, signIn, signInWithRedirect } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
 
 import { Amplify } from 'aws-amplify';
@@ -14,15 +13,10 @@ const client = generateClient();
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (email: string, password: string) => void;
 }
 
-export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setConfirmation] = useState('');
-  const [name, setName] = useState('');
   
 
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +48,11 @@ export default function AuthModal({ isOpen, onClose, onLogin }: AuthModalProps) 
   async function handleSignIn() {
     const { email, newPassword} = formData;
     try {
-      const { isSignedIn, nextStep } = await signIn({ username: email, password: newPassword });
+      const { isSignedIn } = await signIn({ username: email, password: newPassword });
+
+      if (isSignedIn) {
+        navigate('/dashboard');
+      }
     } catch (error) {
       console.log('error signing in', error);
     }

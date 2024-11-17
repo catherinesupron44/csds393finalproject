@@ -1,21 +1,24 @@
 import { Menu, User } from 'lucide-react';
 import { useState, useEffect} from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { getCurrentUser} from "aws-amplify/auth";
+import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
   isAuthenticated: boolean;
   onAuthClick: () => void;
-  onLogout: () => void; // New prop for logout functionality
 }
 
-export default function Navbar({ isAuthenticated, onAuthClick, onLogout }: NavbarProps) {
+export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const [isAuth, setIsAuth] = useState(false);
 
   const navigate = useNavigate();
+
+  async function handleSignOut() {
+    await signOut()
+  }
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -80,19 +83,14 @@ export default function Navbar({ isAuthenticated, onAuthClick, onLogout }: Navba
                   </button>
                 </Link>
                 <button
-                  onClick={onLogout} // Logout button
+                  onClick={handleSignOut} // Logout button
                   className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
                 >
                   Logout
                 </button>
               </div>
             </>
-          ) : (
-            <button
-              className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Sign In
-            </button>
+          ) : ( <></>
           )}
         </div>
 
@@ -116,7 +114,7 @@ export default function Navbar({ isAuthenticated, onAuthClick, onLogout }: Navba
                 Profile
               </MobileNavLink>
               <button
-                onClick={onLogout} // Mobile logout button
+                onClick={handleSignOut} // Mobile logout button
                 className="block px-4 py-2 text-left text-red-500 hover:bg-gray-100 rounded-lg"
               >
                 Logout
@@ -126,23 +124,6 @@ export default function Navbar({ isAuthenticated, onAuthClick, onLogout }: Navba
         )}
       </div>
     </nav>
-  );
-}
-
-function NavLink({ to, active, children }: { 
-  to: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link 
-      to={to}
-      className={`${
-        active ? 'text-indigo-600' : 'text-gray-600 hover:text-indigo-600'
-      } transition-colors`}
-    >
-      {children}
-    </Link>
   );
 }
 
