@@ -21,8 +21,18 @@ const CreateGroup = () => {
     <div>
       <h2>Create a Group</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="name" placeholder="Group Name" onChange={handleChange} />
-        <input type="text" name="description" placeholder="Description" onChange={handleChange} />
+        <input
+          type="text"
+          name="name"
+          placeholder="Group Name"
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="description"
+          placeholder="Description"
+          onChange={handleChange}
+        />
         <button type="submit">Create Group</button>
       </form>
       {message && <p>{message}</p>}
