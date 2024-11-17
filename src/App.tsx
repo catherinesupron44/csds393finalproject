@@ -10,7 +10,7 @@ import Landing from './pages/Landing.jsx';
 import { useState } from 'react';
 import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
 import { signIn } from 'aws-amplify/auth';
-import './awsConfig';
+import './amplifyconfiguration.json';
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -28,9 +28,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100">
-        <Navbar 
-          onAuthClick={() => setIsAuthModalOpen(true)}
-        />
+        <Navbar />
         
         <Routes>
           {/* Public routes */}
