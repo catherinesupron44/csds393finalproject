@@ -1,10 +1,7 @@
 import { Trophy, Users, PlusCircle, History } from 'lucide-react';
-import { useAuthStore } from '../lib/store';
+import GetActiveMarkets from "../components/GetActiveMarkets.jsx";
 
 export default function Dashboard() {
-  const { profile } = useAuthStore();
-
-  if (!profile) return null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -18,7 +15,7 @@ export default function Dashboard() {
         <StatCard
           icon={<Users className="w-6 h-6 text-blue-600" />}
           title="Active Groups"
-          value={profile.groupIds.length.toString()}
+          value= "1"
           trend="2 new this week"
         />
         <StatCard
@@ -39,15 +36,13 @@ export default function Dashboard() {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Active Bets</h2>
+              <h2 className="text-xl font-semibold">Active Markets</h2>
               <button className="text-indigo-600 hover:text-indigo-700 font-medium">
                 View All
               </button>
             </div>
             <div className="space-y-4">
-              {[1, 2, 3].map((bet) => (
-                <BetCard key={bet} />
-              ))}
+              <GetActiveMarkets />
             </div>
           </div>
         </div>
