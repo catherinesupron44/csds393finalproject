@@ -29,9 +29,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100">
-        <Navbar 
-          onAuthClick={() => setIsAuthModalOpen(true)}
-        />
+        <Navbar />
         
         <Routes>
           {/* Public routes */}

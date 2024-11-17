@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getActiveBets } from '../api';
+import { json } from 'react-router-dom';
 
 const GetActiveBets = () => {
   const [bets, setBets] = useState([]);
@@ -11,6 +12,7 @@ const GetActiveBets = () => {
     const fetchActiveBets = async () => {
       try {
         const response = await getActiveBets();
+        console.log(response);
         setBets(response.data);
       } catch (error) {
         setMessage('Error fetching active bets');
@@ -18,6 +20,12 @@ const GetActiveBets = () => {
     };
     fetchActiveBets();
   }, []);
+
+  console.log(bets.data);
+
+  if (bets.length != 0){
+    console.log(JSON.parse(bets));
+  }
 
   return (
     <div>

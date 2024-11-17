@@ -1,4 +1,6 @@
 import { Trophy, Users, PlusCircle, History } from 'lucide-react';
+import Navbar from '../components/Navbar.tsx';
+import GetActiveBets from "../components/GetActiveBets.jsx";
 
 export default function Dashboard() {
 
@@ -41,9 +43,7 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="space-y-4">
-              {[1, 2, 3].map((bet) => (
-                <BetCard key={bet} />
-              ))}
+              <GetActiveBets />
             </div>
           </div>
         </div>
