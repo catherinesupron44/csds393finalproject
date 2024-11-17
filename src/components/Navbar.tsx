@@ -5,9 +5,10 @@ import { Link, useLocation } from 'react-router-dom';
 interface NavbarProps {
   isAuthenticated: boolean;
   onAuthClick: () => void;
+  onLogout: () => void; // New prop for logout functionality
 }
 
-export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
+export default function Navbar({ isAuthenticated, onAuthClick, onLogout }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -38,12 +39,18 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
                 </NavLink>
               </div>
 
-             <div className="hidden md:flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-4">
                 <Link to="/profile">
                   <button className="p-2 rounded-full hover:bg-gray-100">
                     <User className="w-6 h-6 text-gray-600" />
                   </button>
                 </Link>
+                <button
+                  onClick={onLogout} // Logout button
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Logout
+                </button>
               </div>
 
               <div className="md:hidden">
@@ -84,6 +91,12 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
               <MobileNavLink to="/profile" active={location.pathname === '/profile'}>
                 Profile
               </MobileNavLink>
+              <button
+                onClick={onLogout} // Mobile logout button
+                className="block px-4 py-2 text-left text-red-500 hover:bg-gray-100 rounded-lg"
+              >
+                Logout
+              </button>
             </div>
           </div>
         )}
