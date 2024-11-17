@@ -1,5 +1,3 @@
-// src/components/PlaceBet.js
-
 import React, { useState } from 'react';
 import { placeBet } from '../api';
 

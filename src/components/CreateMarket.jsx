@@ -1,5 +1,3 @@
-// src/components/CreateMarket.js
-
 import React, { useState } from 'react';
 import { createMarket } from '../api';
 

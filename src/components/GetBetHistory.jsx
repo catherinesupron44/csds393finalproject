@@ -1,5 +1,3 @@
-// src/components/GetBetHistory.js
-
 import React, { useState, useEffect } from 'react';
 import { getBetHistory } from '../api';
 

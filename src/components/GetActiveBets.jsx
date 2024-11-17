@@ -1,5 +1,3 @@
-// src/components/GetActiveBets.js
-
 import React, { useState, useEffect } from 'react';
 import { getActiveBets } from '../api';
 

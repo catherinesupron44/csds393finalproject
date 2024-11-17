@@ -1,17 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import AuthModal from './components/AuthModal';
-import Dashboard from './pages/Dashboard';
-import Bets from './pages/Bets';
-import Groups from './pages/Groups';
-import Leaderboard from './pages/Leaderboard';
-import Profile from './pages/Profile';
-import Landing from './pages/Landing';
+import Navbar from './components/Navbar.jsx';
+import AuthModal from './components/AuthModal.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import Bets from './pages/Bets.jsx';
+import Groups from './pages/Groups.jsx';
+import Leaderboard from './pages/Leaderboard.jsx';
+import Profile from './pages/Profile.jsx';
+import Landing from './pages/Landing.jsx';
 import { useState } from 'react';
-import ProtectedRoutes from "./utils/ProtectedRoutes";
+import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
 import { signIn } from 'aws-amplify/auth';
 import './awsConfig';
-
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
