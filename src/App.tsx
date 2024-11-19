@@ -4,6 +4,7 @@ import AuthModal from './components/AuthModal.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Bets from './pages/Bets.jsx';
 import Groups from './pages/Groups.jsx';
+import Markets from './pages/Markets.jsx'
 import Leaderboard from './pages/Leaderboard.jsx';
 import Profile from './pages/Profile.jsx';
 import Landing from './pages/Landing.jsx';
@@ -42,6 +43,7 @@ function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bets" element={<Bets />} />
+            <Route path="/markets" element={<Markets />} />
             <Route path="/groups" element={<Groups />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={<Profile />} />

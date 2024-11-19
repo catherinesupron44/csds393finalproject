@@ -3,7 +3,23 @@ import axios from 'axios';
 const API_BASE_URL = 'https://1t61to83lk.execute-api.us-east-2.amazonaws.com/prod';
 
 // Bets Endpoints
-export const createMarket = async (marketData) => await axios.post(`${API_BASE_URL}/bets/createMarket`, marketData);
+export const createMarket = async (userId, title, description, sides, odds, closing_date ) => 
+    await axios.post(
+        `${API_BASE_URL}/bets/createMarket`, 
+        JSON.stringify({ 
+          userId, 
+          title, 
+          description, 
+          sides, 
+          odds,
+          closing_date 
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 export const getActiveBets = async () => await axios.get(`${API_BASE_URL}/bets/getActiveBets`);
 export const getBetHistory = async () => await axios.get(`${API_BASE_URL}/bets/getBetHistory`);
 export const placeBet = async (betData) => await axios.post(`${API_BASE_URL}/bets/placeBet`, betData);
