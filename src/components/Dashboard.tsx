@@ -1,4 +1,5 @@
 import { Trophy, Users, PlusCircle, History } from 'lucide-react';
+import React from 'react';
 
 export default function Dashboard() {
   return (

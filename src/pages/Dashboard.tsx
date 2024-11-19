@@ -1,3 +1,4 @@
+import React from 'react';
 import { Trophy, Users, PlusCircle, History } from 'lucide-react';
 import GetActiveMarkets from "../components/GetActiveMarkets.jsx";
 
