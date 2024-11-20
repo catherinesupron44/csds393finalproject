@@ -3,16 +3,13 @@ import Navbar from './components/Navbar.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Bets from './pages/Bets.jsx';
-import Groups from './pages/Groups.jsx';
-import Markets from './pages/Markets.jsx'
-import Leaderboard from './pages/Leaderboard.jsx';
 import Profile from './pages/Profile.jsx';
 import Landing from './pages/Landing.jsx';
 import { useState } from 'react';
 import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
 import { signIn } from 'aws-amplify/auth';
 import './amplifyconfiguration.json';
-import MyMarkets from './pages/Leaderboard.jsx';
+import MyMarkets from './pages/Markets.jsx';
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -44,9 +41,7 @@ function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bets" element={<Bets />} />
-            <Route path="/markets" element={<Markets />} />
-            <Route path="/groups" element={<Groups />} />
-            <Route path="/mymarkets" element={<MyMarkets />} />
+            <Route path="/markets" element={<MyMarkets />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
 

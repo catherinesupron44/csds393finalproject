@@ -63,14 +63,8 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
                 My Bets
               </button>
               <button 
-                onClick={() => navigate('/groups')}
-                className={`${location.pathname === '/groups' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
-              >
-                Groups
-              </button>
-              <button 
-                onClick={() => navigate('/mymarkets')}
-                className={`${location.pathname === '/mymarkets' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
+                onClick={() => navigate('/markets')}
+                className={`${location.pathname === '/markets' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
               >
                 My Markets
               </button>
@@ -107,7 +101,7 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
               <MobileNavLink to="/groups" active={location.pathname === '/groups'}>
                 Groups
               </MobileNavLink>
-              <MobileNavLink to="/mymarkets" active={location.pathname === '/mymarkets'}>
+              <MobileNavLink to="/markets" active={location.pathname === '/markets'}>
                 My Markets
               </MobileNavLink>
               <MobileNavLink to="/profile" active={location.pathname === '/profile'}>

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import Leaderboard from '../../pages/Leaderboard';
+import Leaderboard from '../../pages/Markets';
 
 /**
  * @jest-environment node
