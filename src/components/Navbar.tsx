@@ -69,10 +69,10 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
                 Groups
               </button>
               <button 
-                onClick={() => navigate('/leaderboard')}
-                className={`${location.pathname === '/leaderboard' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
+                onClick={() => navigate('/mymarkets')}
+                className={`${location.pathname === '/mymarkets' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
               >
-                Leaderboard
+                My Markets
               </button>
               </div>
 
@@ -107,8 +107,8 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
               <MobileNavLink to="/groups" active={location.pathname === '/groups'}>
                 Groups
               </MobileNavLink>
-              <MobileNavLink to="/leaderboard" active={location.pathname === '/leaderboard'}>
-                Leaderboard
+              <MobileNavLink to="/mymarkets" active={location.pathname === '/mymarkets'}>
+                My Markets
               </MobileNavLink>
               <MobileNavLink to="/profile" active={location.pathname === '/profile'}>
                 Profile
