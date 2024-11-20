@@ -12,6 +12,7 @@ import { useState } from 'react';
 import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
 import { signIn } from 'aws-amplify/auth';
 import './amplifyconfiguration.json';
+import MyMarkets from './pages/Leaderboard.jsx';
 
 function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -45,7 +46,7 @@ function App() {
             <Route path="/bets" element={<Bets />} />
             <Route path="/markets" element={<Markets />} />
             <Route path="/groups" element={<Groups />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/mymarkets" element={<MyMarkets />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
 
