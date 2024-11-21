@@ -29,7 +29,15 @@ export const settleBet = async (betId) => await axios.post(`${API_BASE_URL}/bets
 export const getActiveMarkets = async () => await axios.get(`${API_BASE_URL}/markets/getActiveMarkets`);
 export const getMarketInformation = async (marketId) => await axios.get(`${API_BASE_URL}/markets/getMarketInformation`, { params: { marketId } });
 export const settleMarket = async (marketId) => await axios.post(`${API_BASE_URL}/markets/settleMarket`, { marketId });
-export const getMyMarkets = async (userId) => axios.post(`${API_BASE_URL}/markets/settleMarket`, userId);
+export const getMyMarkets = async (user_id) => axios.get(`${API_BASE_URL}/markets/getMyMarkets`,         
+  JSON.stringify({ 
+    user_id, 
+  }),
+  {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 
 // Profile and Group Endpoints
 export const createGroup = async (groupData) => await axios.post(`${API_BASE_URL}/profile/createGroup`, groupData);
