@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { getActiveMarkets } from '../api';
-import CreateBetModal from './CreateBetModal';
+import CreateMarketModal from './CreateMarketModal';
+import { getCurrentUser } from 'aws-amplify/auth';
 
 const GetActiveMarkets = () => {
   const [markets, setMarkets] = useState([]);
   const [message, setMessage] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false); // Track modal visibility
 
   useEffect(() => {
     const fetchActiveMarkets = async () => {
+      try {
+        const user = await getCurrentUser();
+        console.log(user);
+        setCurrentUser(user);
+      } catch (err) {
+        console.log(err);
+      }
       try {
         const response = await getActiveMarkets();
         console.log('API Response:', response); // Log the whole response
@@ -26,7 +35,6 @@ const GetActiveMarkets = () => {
         setMessage('Error fetching active markets');
       }
     };
-
     fetchActiveMarkets();
   }, []);
 
@@ -60,9 +68,10 @@ const GetActiveMarkets = () => {
       </div>
 
       {/* Create Bet Modal */}
-      <CreateBetModal
+      <CreateMarketModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)} // Close modal
+        onClose={() => setIsCreateModalOpen(false)}
+        currentUser={currentUser}
       />
     </div>
   );

@@ -12,7 +12,9 @@ const GetMyMarkets = () => {
   useEffect(() => {    
     const fetchMyMarkets = async () => {
       try {
-        const response = await getMyMarkets(await getCurrentUser().userId);
+        const user = await getCurrentUser();
+        console.log(user);
+        const response = await getMyMarkets(user.userId);
         console.log('API Response:', response); // Log the whole response
         console.log('API Response Data:', response.data); // Log the data part of the response
 

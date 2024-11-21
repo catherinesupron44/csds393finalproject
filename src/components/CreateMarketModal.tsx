@@ -6,10 +6,10 @@ import { createMarket } from '../api';
 interface CreateMarketModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userId: any
+  currentUser: any
 }
 
-export default function CreateMarketModal({ isOpen, onClose, userId }: CreateMarketModalProps) {
+export default function CreateMarketModal({ isOpen, onClose, currentUser }: CreateMarketModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [closing_date, setEndDate] = useState('');
@@ -55,7 +55,8 @@ export default function CreateMarketModal({ isOpen, onClose, userId }: CreateMar
     try {
       const sides = {'sideOne' : sideOne, 'sideTwo' : sideTwo};
       const odds = {'sideOne' : sideOneOdds, 'sideTwo' : sideTwoOdds}
-      const response = await createMarket(userId, title, description, sides, odds, closing_date);
+      console.log(currentUser);
+      const response = await createMarket(currentUser.userId, title, description, sides, odds, closing_date);
       console.log(response);
       //console.log(`Market created with ID: ${response.data.market_id}`);
     } catch (error) {
