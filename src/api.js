@@ -24,11 +24,12 @@ export const getActiveBets = async () => await axios.get(`${API_BASE_URL}/bets/g
 export const getBetHistory = async () => await axios.get(`${API_BASE_URL}/bets/getBetHistory`);
 export const placeBet = async (betData) => await axios.post(`${API_BASE_URL}/bets/placeBet`, betData);
 export const settleBet = async (betId) => await axios.post(`${API_BASE_URL}/bets/settleBet`, { betId });
+export const getCoins = async (user_id) => await axios.post(`${API_BASE_URL}/bets/getCoins`, {user_id})
 
 // Markets Endpoints
 export const getActiveMarkets = async () => await axios.get(`${API_BASE_URL}/markets/getActiveMarkets`);
 export const getMarketInformation = async (marketId) => await axios.get(`${API_BASE_URL}/markets/getMarketInformation`, { params: { marketId } });
-export const settleMarket = async (marketId) => await axios.post(`${API_BASE_URL}/markets/settleMarket`, { marketId });
+export const settleMarket = async (market_id, outcome) => await axios.post(`${API_BASE_URL}/markets/settleMarket`, { market_id, outcome });
 export const getMyMarkets = async (userId) => axios.get(`${API_BASE_URL}/markets/getMyMarkets`, { params: { userId } });
 
 // Profile and Group Endpoints
