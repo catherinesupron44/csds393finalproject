@@ -1,5 +1,5 @@
 import { Menu, User } from 'lucide-react';
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useNavigate } from 'react-router-dom';
@@ -13,24 +13,22 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const [isAuth, setIsAuth] = useState(false);
-
   const navigate = useNavigate();
 
   async function handleSignOut() {
-    await signOut()
+    await signOut();
   }
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const user = await getCurrentUser()
-        
+        const user = await getCurrentUser();
         if (user) {
-          setIsAuth(true)
+          setIsAuth(true);
         }
       } catch (err) {
-        setIsAuth(false)
-        console.log(err);
+        setIsAuth(false);
+        console.error(err);
       }
     };
 
@@ -50,27 +48,49 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
           {isAuth ? (
             <>
               <div className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={() => navigate('/dashboard')}
-                className={`${location.pathname === '/dashboard' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
-              >
-                Dashboard
-              </button>
-              <button 
-                onClick={() => navigate('/bets')}
-                className={`${location.pathname === '/bets' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
-              >
-                My Bets
-              </button>
-              <button 
-                onClick={() => navigate('/markets')}
-                className={`${location.pathname === '/markets' ? 'text-indigo-600 font-medium' : 'text-gray-600 hover:text-gray-900'}`}
-              >
-                My Markets
-              </button>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className={`${
+                    location.pathname === '/dashboard'
+                      ? 'text-indigo-600 font-medium'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => navigate('/bets')}
+                  className={`${
+                    location.pathname === '/bets'
+                      ? 'text-indigo-600 font-medium'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  My Bets
+                </button>
+                <button
+                  onClick={() => navigate('/markets')}
+                  className={`${
+                    location.pathname === '/markets'
+                      ? 'text-indigo-600 font-medium'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  My Markets
+                </button>
               </div>
 
               <div className="hidden md:flex items-center space-x-4">
+                {/* Placeholder for coins */}
+                <div className="flex items-center text-gray-600 space-x-2">
+                  <div
+                    className="w-6 h-6 rounded-full bg-yellow-400 border border-yellow-500 flex items-center justify-center text-xs font-bold text-gray-800"
+                    style={{ boxShadow: '0 0 5px rgba(255, 215, 0, 0.7)' }}
+                  >
+                    $
+                  </div>
+                  <span className="font-medium text-lg">1234</span>
+                </div>
                 <Link to="/profile">
                   <button className="p-2 rounded-full hover:bg-gray-100">
                     <User className="w-6 h-6 text-gray-600" />
@@ -84,7 +104,8 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
                 </button>
               </div>
             </>
-          ) : ( <></>
+          ) : (
+            <></>
           )}
         </div>
 
@@ -127,7 +148,7 @@ function MobileNavLink({ to, active, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <Link 
+    <Link
       to={to}
       className={`block px-4 py-2 rounded-lg ${
         active ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-100'
