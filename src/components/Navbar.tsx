@@ -56,7 +56,7 @@ export default function Navbar({ isAuthenticated, onAuthClick }: NavbarProps) {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  Dashboard
+                  Active Markets
                 </button>
                 <button
                   onClick={() => navigate('/bets')}
