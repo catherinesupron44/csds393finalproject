@@ -13,7 +13,6 @@ const GetMyMarkets = () => {
     const fetchMyMarkets = async () => {
       try {
         const user = await getCurrentUser();
-        console.log(user);
         const response = await getMyMarkets(user.userId);
         console.log('API Response:', response); // Log the whole response
         console.log('API Response Data:', response.data); // Log the data part of the response
@@ -41,10 +40,11 @@ const GetMyMarkets = () => {
           markets.map((market, index) => (
             <div key={index}>
               <MarketTile
-                title={market.name}
-                description={market.description}
+                title={market.name || 'Unnamed Market'}
+                description={market.description || 'No description'}
                 sides={market.sides}
                 odds={market.odds}
+                closing_date = {market.closing_date}
               />
             </div>
           ))
@@ -62,34 +62,56 @@ const GetMyMarkets = () => {
   );
 };
 
-const MarketTile = ({ title, description, sides, odds }) => {
-  const [selectedSide, setSelectedSide] = useState(null);
-
-  const handleSideClick = (sideName) => {
-    setSelectedSide(sideName);
-    alert(`You selected: ${sideName}`);
+const MarketTile = ({ title, description, sides, odds, settled, closing_date }) => {
+  const formatDateTime = (datetime) => {
+    const date = new Date(datetime);
+  
+    // Options for formatting the date and time
+    const options = {
+      weekday: 'long', // Full day name (e.g., "Friday")
+      year: 'numeric', // Full year
+      month: 'long',   // Full month name (e.g., "November")
+      day: 'numeric',  // Day of the month
+      hour: '2-digit', // Hour (e.g., "05 PM")
+      minute: '2-digit', // Minute (e.g., ":53")
+    };
+  
+    return date.toLocaleDateString('en-US', options);
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-    <div className="flex justify-between items-start">
-      <div>
-        <h3 className="font-semibold">{title}</h3>
-        <p className="text-sm text-gray-600 mt-1">{description}</p>
+    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
+      {settled === 'To be settled' && (
+        <button
+          className="absolute top-2 right-2 bg-indigo-600 text-white text-sm font-medium py-1 px-3 rounded hover:bg-indigo-700 transition"
+        >
+          Settle Market
+        </button>
+      )}
+
+      <h3 className="font-semibold text-lg mb-2">{title}</h3>
+      <p className="text-sm text-gray-600 mb-4">{description}</p>
+
+      <div className="grid grid-cols-2 gap-4 text-center">
+        <div>
+          <p className="font-medium">{sides?.sideOne || 'N/A'}</p>
+          <p className="text-sm text-gray-500">Odds: {odds?.sideOne || 'N/A'}</p>
+        </div>
+        <div>
+          <p className="font-medium">{sides?.sideTwo || 'N/A'}</p>
+          <p className="text-sm text-gray-500">Odds: {odds?.sideTwo || 'N/A'}</p>
+        </div>
       </div>
-      <span
-        className={`text-xs px-2 py-1 rounded`}
-      >
-        {sides}
-      </span>
+
+      <div className="mt-4 text-sm text-gray-600">
+        <p>
+          <strong>Status:</strong> {settled || 'Not Settled'}
+        </p>
+        <p>
+          <strong>Closes:</strong> {closing_date ? formatDateTime(closing_date) : 'Unknown'}
+        </p>
+      </div>
     </div>
-    <div className="flex justify-between items-center mt-4">
-      <span className="text-sm text-gray-500">{odds}</span>
-      <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
-        View Details
-      </button>
-    </div>
-  </div>
   );
 };
 
