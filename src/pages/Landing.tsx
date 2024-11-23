@@ -1,40 +1,66 @@
-import { Trophy, Users, Medal } from 'lucide-react';
+import { Trophy, Users, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getCurrentUser } from 'aws-amplify/auth'; // Assuming you're using AWS Amplify for authentication
 
 interface LandingProps {
   onGetStarted: () => void;
 }
 
 export default function Landing({ onGetStarted }: LandingProps) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check if the user is logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const user = await getCurrentUser(); // Check if user is logged in
+        if (user) {
+          setIsLoggedIn(true); // User is logged in
+        } else {
+          setIsLoggedIn(false); // User is not logged in
+        }
+      } catch (error) {
+        setIsLoggedIn(false); // User is not logged in
+      }
+    };
+
+    checkUser();
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-16 text-center">
       <h1 className="text-5xl font-bold text-indigo-900 mb-6">
         Welcome to BetBuddy
       </h1>
       <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-        Track friendly bets, compete with friends, and climb the leaderboard - all without real money stakes!
+        Track friendly bets and compete with friends - all without real money stakes!
       </p>
-      <button
-        onClick={onGetStarted}
-        className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors"
-      >
-        Get Started
-      </button>
-      
+
+      {/* Conditionally render the Get Started button */}
+      {!isLoggedIn && (
+        <button
+          onClick={onGetStarted}
+          className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors"
+        >
+          Get Started
+        </button>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
         <FeatureCard 
           icon={<Trophy className="w-8 h-8 text-indigo-600" />}
-          title="Compete & Win"
-          description="Create custom bets and challenge your friends in various categories"
+          title="Track Your Wins"
+          description="Effortlessly track your winnings and losses as you rise to the top."
         />
         <FeatureCard 
           icon={<Users className="w-8 h-8 text-indigo-600" />}
-          title="Join Groups"
-          description="Create or join betting groups based on your interests"
+          title="Join Exciting Markets"
+          description="Get in on the action by creating or joining markets that match your interests."
         />
         <FeatureCard 
-          icon={<Medal className="w-8 h-8 text-indigo-600" />}
-          title="Earn Badges"
-          description="Unlock achievements and climb the global leaderboard"
+          icon={<Star className="w-8 h-8 text-indigo-600" />}
+          title="Bet, Compete & Win"
+          description="Challenge friends, place your bets, and prove you’ve got the best instincts."
         />
       </div>
     </div>
