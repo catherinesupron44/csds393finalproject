@@ -79,18 +79,21 @@ const GetActiveMarkets = () => {
 
 const MarketTile = ({ title, description, sides, odds, id}) => {
   const [selectedSide, setSelectedSide] = useState(null);
+  const [selectedOdds, setSelectedOdds] = useState(null);
   const [stake, setStake] = useState('');
-  const [currentUserId, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [message, setMessage] = useState("");
 
-  const handleSideClick = (side) => {
+  const handleSideClick = (side, sOdds) => {
     setSelectedSide(side);
+    setSelectedOdds(sOdds)
   };
 
   const onSubmit = async () => {
     try {
       const user = await getCurrentUser();
-      setCurrentUser(user.userId);
+      console.log(user);
+      setCurrentUser(user);
     } catch (err) {
       console.error(err);
     }
@@ -99,7 +102,8 @@ const MarketTile = ({ title, description, sides, odds, id}) => {
 
     try {
       console.log("and here");
-      const response = await placeBet({ currentUserId, id, selectedSide, stake});
+      const userId = currentUser.userId;
+      const response = await placeBet(userId, id, selectedSide, selectedOdds, stake);
       console.log(response);
       setMessage(`Bet created with ID: ${response.data.market_id}`);
     } catch (error) {
@@ -137,7 +141,7 @@ const MarketTile = ({ title, description, sides, odds, id}) => {
                 className={`w-full px-4 py-3 rounded text-white text-center ${
                   selectedSide === value ? 'bg-indigo-900' : 'bg-indigo-500'
                 } hover:bg-indigo-600`}
-                onClick={() => handleSideClick(value)}
+                onClick={() => handleSideClick(value, odds?.[key])}
               >
                 {handleLine(odds?.[key]) || 'N/A'}
               </button>

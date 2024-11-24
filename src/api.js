@@ -22,7 +22,22 @@ export const createMarket = async (userId, title, description, sides, odds, clos
       );
 export const getActiveBets = async () => await axios.get(`${API_BASE_URL}/bets/getActiveBets`);
 export const getBetHistory = async () => await axios.get(`${API_BASE_URL}/bets/getBetHistory`);
-export const placeBet = async (user_id, market_id, side, amount) => await axios.post(`${API_BASE_URL}/bets/placeBet`, { params: { user_id, market_id, side, amount } });
+export const placeBet = async (user_id, market_id, side, odds, amount ) => 
+  await axios.post(
+      `${API_BASE_URL}/bets/placeBet`, 
+      JSON.stringify({ 
+        user_id, 
+        market_id, 
+        side, 
+        odds,
+        amount 
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 export const settleBet = async (betId) => await axios.post(`${API_BASE_URL}/bets/settleBet`, { betId });
 export const getCoins = async (user_id) => await axios.get(`${API_BASE_URL}/bets/getCoins`, {params : {user_id} })
 
