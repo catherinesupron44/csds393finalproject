@@ -44,6 +44,7 @@ const GetMyMarkets = () => {
                 description={market.description || 'No description'}
                 sides={market.sides}
                 odds={market.odds}
+                settled={market.settled}
                 closing_date = {market.closing_date}
               />
             </div>
@@ -81,7 +82,7 @@ const MarketTile = ({ title, description, sides, odds, settled, closing_date }) 
 
   return (
     <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
-      {settled === 'To be settled' && (
+      {settled === 'to be settled' && (
         <button
           className="absolute top-2 right-2 bg-indigo-600 text-white text-sm font-medium py-1 px-3 rounded hover:bg-indigo-700 transition"
         >
