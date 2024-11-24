@@ -24,7 +24,7 @@ export const getActiveBets = async () => await axios.get(`${API_BASE_URL}/bets/g
 export const getBetHistory = async () => await axios.get(`${API_BASE_URL}/bets/getBetHistory`);
 export const placeBet = async (betData) => await axios.post(`${API_BASE_URL}/bets/placeBet`, betData);
 export const settleBet = async (betId) => await axios.post(`${API_BASE_URL}/bets/settleBet`, { betId });
-export const getCoins = async (user_id) => await axios.post(`${API_BASE_URL}/bets/getCoins`, {user_id})
+export const getCoins = async (user_id) => await axios.get(`${API_BASE_URL}/bets/getCoins`, {params : {user_id} })
 
 // Markets Endpoints
 export const getActiveMarkets = async () => await axios.get(`${API_BASE_URL}/markets/getActiveMarkets`);
