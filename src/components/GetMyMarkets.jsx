@@ -84,7 +84,7 @@ const MarketTile = ({ title, description, sides, odds, settled, closing_date }) 
     <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
       {settled === 'to be settled' && (
         <button
-          className="absolute top-2 right-2 bg-indigo-600 text-white text-sm font-medium py-1 px-3 rounded hover:bg-indigo-700 transition"
+          className="absolute top-4 right-4 bg-indigo-600 text-white text-sm font-medium py-1 px-3 rounded hover:bg-indigo-700 transition"
         >
           Settle Market
         </button>
