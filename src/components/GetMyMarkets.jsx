@@ -40,15 +40,21 @@ const GetMyMarkets = () => {
   };
 
   const handleConfirmWinner = async (winner) => {
+    console.log(winner);
+    console.log(selectedMarket);
     try {
       // Call API to settle the market and set the outcome
-      const response = await settleMarket(selectedMarket.id, winner);
-      if (response.data.success) {
-        console.log(`Market ID: ${selectedMarket.id} settled with winner: ${winner}`);
+      console.log("here");
+      const response = await settleMarket(selectedMarket.market_id, winner);
+
+      console.log(response);
+
+      if (response.data.settled) {
+        console.log(`Market ID: ${selectedMarket.market_id} settled with winner: ${winner}`);
         
         // Optionally, you can update the local market state to reflect the outcome
         setMarkets(markets.map((market) => 
-          market.id === selectedMarket.id ? { ...market, outcome: winner, settled: 'settled' } : market
+          market.market_id === selectedMarket.market_id ? { ...market, outcome: winner, settled: true } : market
         ));
         
         setIsSettleModalOpen(false); // Close the modal after successful settlement
@@ -90,16 +96,15 @@ const GetMyMarkets = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
             <h3 className="text-xl font-semibold mb-4">Settle Market</h3>
             <p className="mb-4">Choose the winner for the market "{selectedMarket.name}"</p>
-
             <div className="space-y-4">
               <button
-                onClick={() => handleConfirmWinner('sideOne')}
+                onClick={() => handleConfirmWinner(selectedMarket.sides?.sideOne)}
                 className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
               >
                 {selectedMarket.sides?.sideOne} Wins
               </button>
               <button
-                onClick={() => handleConfirmWinner('sideTwo')}
+                onClick={() => handleConfirmWinner(selectedMarket.sides?.sideTwo)}
                 className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700"
               >
                 {selectedMarket.sides?.sideTwo} Wins
@@ -161,9 +166,16 @@ const MarketTile = ({ market, onSettleMarket }) => {
       </div>
 
       <div className="mt-4 text-sm text-gray-600">
-        <p>
-          <strong>Status:</strong> {market.settled || 'Not Settled'}
-        </p>
+      <p>
+    <strong>Status:</strong>{' '}
+    {market.settled === true
+      ? 'Settled'
+      : market.settled === false
+      ? 'Not Settled'
+      : market.settled === 'to be settled'
+      ? 'To Be Settled'
+      : 'Unknown'}
+  </p>
         <p>
           <strong>Closes:</strong> {market.closing_date ? formatDateTime(market.closing_date) : 'Unknown'}
         </p>
