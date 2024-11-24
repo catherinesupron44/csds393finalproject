@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getActiveMarkets } from '../api';
+import React, { useState, useEffect, use } from 'react';
+import { getActiveMarkets, placeBet } from '../api';
 import CreateMarketModal from './CreateMarketModal';
 import { getCurrentUser } from 'aws-amplify/auth';
 
@@ -58,6 +58,7 @@ const GetActiveMarkets = () => {
                 description={market.description}
                 sides={market.sides}
                 odds={market.odds}
+                id={market.market_id}
               />
             </div>
           ))
@@ -76,12 +77,34 @@ const GetActiveMarkets = () => {
   );
 };
 
-const MarketTile = ({ title, description, sides, odds }) => {
+const MarketTile = ({ title, description, sides, odds, id}) => {
   const [selectedSide, setSelectedSide] = useState(null);
   const [stake, setStake] = useState('');
+  const [currentUserId, setCurrentUser] = useState(null);
+  const [message, setMessage] = useState("");
 
   const handleSideClick = (side) => {
     setSelectedSide(side);
+  };
+
+  const onSubmit = async () => {
+    try {
+      const user = await getCurrentUser();
+      setCurrentUser(user.userId);
+    } catch (err) {
+      console.error(err);
+    }
+
+    console.log("here");
+
+    try {
+      console.log("and here");
+      const response = await placeBet({ currentUserId, id, selectedSide, stake});
+      console.log(response);
+      setMessage(`Bet created with ID: ${response.data.market_id}`);
+    } catch (error) {
+      setMessage('Error creating bet');
+    }
   };
 
   const handleStakeChange = (event) => {
@@ -112,7 +135,7 @@ const MarketTile = ({ title, description, sides, odds }) => {
             <div key={index} className="text-center">
               <button
                 className={`w-full px-4 py-3 rounded text-white text-center ${
-                  selectedSide === value ? 'bg-indigo-700' : 'bg-indigo-500'
+                  selectedSide === value ? 'bg-indigo-900' : 'bg-indigo-500'
                 } hover:bg-indigo-600`}
                 onClick={() => handleSideClick(value)}
               >
