@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getMyMarkets } from '../api';
+import { getMyMarkets, settleMarket } from '../api'; // Ensure this points to the API file
 import CreateBetModal from './CreateBetModal';
 import { getCurrentUser } from 'aws-amplify/auth';
 
@@ -8,14 +8,15 @@ const GetMyMarkets = () => {
   const [message, setMessage] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false); // Track modal visibility
+  const [isSettleModalOpen, setIsSettleModalOpen] = useState(false); // Track settle modal visibility
+  const [selectedMarket, setSelectedMarket] = useState(null); // Store selected market for settling
 
-  useEffect(() => {    
+  useEffect(() => {
     const fetchMyMarkets = async () => {
       try {
         const user = await getCurrentUser();
         const response = await getMyMarkets(user.userId);
-        console.log('API Response:', response); // Log the whole response
-        console.log('API Response Data:', response.data); // Log the data part of the response
+        console.log('API Response:', response);
 
         if (Array.isArray(response.data)) {
           setMarkets(response.data);
@@ -33,6 +34,33 @@ const GetMyMarkets = () => {
     fetchMyMarkets();
   }, []);
 
+  const handleSettleMarket = (market) => {
+    setSelectedMarket(market);  // Set the selected market to be settled
+    setIsSettleModalOpen(true);  // Open the settle modal
+  };
+
+  const handleConfirmWinner = async (winner) => {
+    try {
+      // Call API to settle the market and set the outcome
+      const response = await settleMarket(selectedMarket.id, winner);
+      if (response.data.success) {
+        console.log(`Market ID: ${selectedMarket.id} settled with winner: ${winner}`);
+        
+        // Optionally, you can update the local market state to reflect the outcome
+        setMarkets(markets.map((market) => 
+          market.id === selectedMarket.id ? { ...market, outcome: winner, settled: 'settled' } : market
+        ));
+        
+        setIsSettleModalOpen(false); // Close the modal after successful settlement
+      } else {
+        setMessage('Failed to settle market');
+      }
+    } catch (error) {
+      console.error('Error settling market:', error);
+      setMessage('Error settling market');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -40,12 +68,8 @@ const GetMyMarkets = () => {
           markets.map((market, index) => (
             <div key={index}>
               <MarketTile
-                title={market.name || 'Unnamed Market'}
-                description={market.description || 'No description'}
-                sides={market.sides}
-                odds={market.odds}
-                settled={market.settled}
-                closing_date = {market.closing_date}
+                market={market}
+                onSettleMarket={handleSettleMarket}  // Pass the settle handler
               />
             </div>
           ))
@@ -59,57 +83,89 @@ const GetMyMarkets = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)} // Close modal
       />
+
+      {/* Settle Market Modal */}
+      {isSettleModalOpen && selectedMarket && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-xl font-semibold mb-4">Settle Market</h3>
+            <p className="mb-4">Choose the winner for the market "{selectedMarket.name}"</p>
+
+            <div className="space-y-4">
+              <button
+                onClick={() => handleConfirmWinner('sideOne')}
+                className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+              >
+                {selectedMarket.sides?.sideOne} Wins
+              </button>
+              <button
+                onClick={() => handleConfirmWinner('sideTwo')}
+                className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700"
+              >
+                {selectedMarket.sides?.sideTwo} Wins
+              </button>
+            </div>
+
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => setIsSettleModalOpen(false)}  // Close modal without settling
+                className="text-sm text-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const MarketTile = ({ title, description, sides, odds, settled, closing_date }) => {
+const MarketTile = ({ market, onSettleMarket }) => {
   const formatDateTime = (datetime) => {
     const date = new Date(datetime);
-  
-    // Options for formatting the date and time
     const options = {
-      weekday: 'long', // Full day name (e.g., "Friday")
-      year: 'numeric', // Full year
-      month: 'long',   // Full month name (e.g., "November")
-      day: 'numeric',  // Day of the month
-      hour: '2-digit', // Hour (e.g., "05 PM")
-      minute: '2-digit', // Minute (e.g., ":53")
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     };
-  
     return date.toLocaleDateString('en-US', options);
   };
 
   return (
     <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
-      {settled === 'to be settled' && (
+      {market.settled === 'to be settled' && (
         <button
+          onClick={() => onSettleMarket(market)} // Trigger the settle modal
           className="absolute top-4 right-4 bg-indigo-600 text-white text-sm font-medium py-1 px-3 rounded hover:bg-indigo-700 transition"
         >
           Settle Market
         </button>
       )}
 
-      <h3 className="font-semibold text-lg mb-2">{title}</h3>
-      <p className="text-sm text-gray-600 mb-4">{description}</p>
+      <h3 className="font-semibold text-lg mb-2">{market.name || 'Unnamed Market'}</h3>
+      <p className="text-sm text-gray-600 mb-4">{market.description || 'No description'}</p>
 
       <div className="grid grid-cols-2 gap-4 text-center">
         <div>
-          <p className="font-medium">{sides?.sideOne || 'N/A'}</p>
-          <p className="text-sm text-gray-500">Odds: {odds?.sideOne || 'N/A'}</p>
+          <p className="font-medium">{market.sides?.sideOne || 'N/A'}</p>
+          <p className="text-sm text-gray-500">Odds: {market.odds?.sideOne || 'N/A'}</p>
         </div>
         <div>
-          <p className="font-medium">{sides?.sideTwo || 'N/A'}</p>
-          <p className="text-sm text-gray-500">Odds: {odds?.sideTwo || 'N/A'}</p>
+          <p className="font-medium">{market.sides?.sideTwo || 'N/A'}</p>
+          <p className="text-sm text-gray-500">Odds: {market.odds?.sideTwo || 'N/A'}</p>
         </div>
       </div>
 
       <div className="mt-4 text-sm text-gray-600">
         <p>
-          <strong>Status:</strong> {settled || 'Not Settled'}
+          <strong>Status:</strong> {market.settled || 'Not Settled'}
         </p>
         <p>
-          <strong>Closes:</strong> {closing_date ? formatDateTime(closing_date) : 'Unknown'}
+          <strong>Closes:</strong> {market.closing_date ? formatDateTime(market.closing_date) : 'Unknown'}
         </p>
       </div>
     </div>
