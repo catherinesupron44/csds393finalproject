@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect} from 'react';
+import { Plus, Filter } from 'lucide-react';
+import BetCard from '../components/BetCard';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { getBetHistory } from "../api";
+import { getBetHistory } from '../api';
 
-export default function BetHistory() {
+export default function Bets() {
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [bets, setBets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -34,63 +36,55 @@ export default function BetHistory() {
     fetchMyMarkets();
   }, []);
 
+  const filteredBets = bets.filter((bet) => {
+    const statusMatch = selectedStatus === 'all' || bet.status === selectedStatus;
+    return statusMatch;
+  });
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-12 bg-gray-200 rounded"></div>
+            <div className="h-12 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">My Bet History</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">My Bets</h1>
       </div>
 
-      {loading ? (
-        <p className="text-gray-500 text-center">Loading...</p>
-      ) : bets.length === 0 ? (
-        <p className="text-gray-500 text-center">No bets found.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {bets.map((bet, index) => (
-            <BetCard key={index} bet={bet} />
+      <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div className="flex items-center space-x-4 mb-4">
+          <Filter className="w-5 h-5 text-gray-500" />
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="expired">Expired</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredBets.map((bet) => (
+            <BetCard
+              key={bet.bet_id}
+              bet={bet}
+            />
           ))}
         </div>
-      )}
-    </div>
-  );
-}
-
-function BetCard({ bet}) {
-  const statusColors = {
-    Active: "bg-green-100 text-green-800",
-    Completed: "bg-gray-100 text-gray-800",
-  };
-
-  const formatDateTime = (datetime) => {
-    const date = new Date(datetime);
-    const options = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    return date.toLocaleDateString('en-US', options);
-  };
-
-  return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-semibold">{bet.market_info.name}</h3>
-          <p className="text-sm text-gray-600 mt-1">{bet.market_info.description}</p>
-          <p className="text-sm text-gray-600 mt-1">{bet.side}</p>
-        </div>
-        <span
-          className={`text-xs px-2 py-1 rounded ${statusColors[bet.status]}`}
-        >
-          {bet.status}
-        </span>
-      </div>
-      <div className="flex justify-between items-center mt-4">
-        <span className="text-sm text-gray-500">{formatDateTime(bet.market_info.closing_date)}</span>
-        <span className="text-sm text-gray-500">{"Stake: " + bet.amount}</span>
       </div>
     </div>
   );
