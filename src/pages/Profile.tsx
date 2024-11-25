@@ -61,12 +61,26 @@ function BetCard({ bet}) {
     Completed: "bg-gray-100 text-gray-800",
   };
 
+  const formatDateTime = (datetime) => {
+    const date = new Date(datetime);
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
+    return date.toLocaleDateString('en-US', options);
+  };
+
   return (
     <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-semibold">{bet.title}</h3>
-          <p className="text-sm text-gray-600 mt-1">{bet.description}</p>
+          <h3 className="font-semibold">{bet.market_info.name}</h3>
+          <p className="text-sm text-gray-600 mt-1">{bet.market_info.description}</p>
+          <p className="text-sm text-gray-600 mt-1">{bet.side}</p>
         </div>
         <span
           className={`text-xs px-2 py-1 rounded ${statusColors[bet.status]}`}
@@ -75,10 +89,8 @@ function BetCard({ bet}) {
         </span>
       </div>
       <div className="flex justify-between items-center mt-4">
-        <span className="text-sm text-gray-500">{bet.endDate}</span>
-        <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
-          View Details
-        </button>
+        <span className="text-sm text-gray-500">{formatDateTime(bet.market_info.closing_date)}</span>
+        <span className="text-sm text-gray-500">{"Stake: " + bet.amount}</span>
       </div>
     </div>
   );
