@@ -20,8 +20,8 @@ export const createMarket = async (userId, title, description, sides, odds, clos
           }
         }
       );
-export const getActiveBets = async () => await axios.get(`${API_BASE_URL}/bets/getActiveBets`);
-export const getBetHistory = async () => await axios.get(`${API_BASE_URL}/bets/getBetHistory`);
+export const getActiveBets = async (user_id) => await axios.get(`${API_BASE_URL}/bets/getActiveBets`, {params : {user_id} });
+export const getBetHistory = async (user_id) => await axios.get(`${API_BASE_URL}/bets/getBetHistory`, {params : {user_id} });
 export const placeBet = async (user_id, market_id, side, odds, amount ) => 
   await axios.post(
       `${API_BASE_URL}/bets/placeBet`, 
@@ -61,13 +61,4 @@ export const settleMarket = async (market_id, outcome) =>
     );
 
 export const getMyMarkets = async (userId) => axios.get(`${API_BASE_URL}/markets/getMyMarkets`, { params: { userId } });
-
-// Profile and Group Endpoints
-export const createGroup = async (groupData) => await axios.post(`${API_BASE_URL}/profile/createGroup`, groupData);
-export const getGroupId = async (userId) => await axios.get(`${API_BASE_URL}/profile/getGroupId`, { params: { userId } });
-export const getGroupInformation = async (groupId) => await axios.get(`${API_BASE_URL}/profile/getGroupInformation`, { params: { groupId } });
-export const getGroupLeaderboard = async (groupId) => await axios.get(`${API_BASE_URL}/profile/getGroupLeaderboard`, { params: { groupId } });
-export const joinGroup = async (groupId) => await axios.post(`${API_BASE_URL}/profile/joinGroup`, { groupId });
-export const leaveGroup = async (groupId) => await axios.post(`${API_BASE_URL}/profile/leaveGroup`, { groupId });
-export const setGroupId = async (userId, groupId) => await axios.post(`${API_BASE_URL}/profile/setGroupId`, { userId, groupId });
 

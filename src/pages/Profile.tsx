@@ -1,41 +1,37 @@
 import React, { useEffect, useState } from 'react';
+import { getCurrentUser } from 'aws-amplify/auth';
+import { getBetHistory } from "../api";
 
 export default function BetHistory() {
   const [bets, setBets] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Simulate API call to fetch bet history
-  const getBetHistory = async () => {
-    setLoading(true);
-    // Replace this with an actual API call
-    const fetchedBets = [
-      {
-        title: "Super Bowl LVIII Winner",
-        description: "Kansas City Chiefs vs San Francisco 49ers",
-        status: "Active",
-        endDate: "Ends in 2 days",
-      },
-      {
-        title: "NBA Finals Winner",
-        description: "Lakers vs Celtics",
-        status: "Completed",
-        endDate: "Ended 1 month ago",
-      },
-      {
-        title: "World Cup Finals",
-        description: "Argentina vs France",
-        status: "Active",
-        endDate: "Ends in 10 days",
-      },
-    ];
-    setTimeout(() => {
-      setBets(fetchedBets);
-      setLoading(false);
-    }, 1000); // Simulating a network delay
-  };
+  const [currentUser, setCurrentUser] = useState(null);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    getBetHistory();
+    setLoading(true);
+    const fetchMyMarkets = async () => {
+      try {
+        const user = await getCurrentUser();
+        const response = await getBetHistory(user.userId);
+        console.log('API Response:', response);
+
+        if (Array.isArray(response.data)) {
+          setBets(response.data);
+        } else if (response.data && typeof response.data === 'object') {
+          setBets(Object.values(response.data));
+        } else {
+          setMessage('Invalid data format');
+        }
+      } catch (error) {
+        console.error('Error fetching active markets:', error);
+        setMessage('Error fetching active markets');
+      }
+
+      setLoading(false);
+    };
+
+    fetchMyMarkets();
   }, []);
 
   return (
@@ -59,7 +55,7 @@ export default function BetHistory() {
   );
 }
 
-function BetCard({ bet }) {
+function BetCard({ bet}) {
   const statusColors = {
     Active: "bg-green-100 text-green-800",
     Completed: "bg-gray-100 text-gray-800",

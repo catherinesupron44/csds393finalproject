@@ -1,30 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { Plus, Filter } from 'lucide-react';
 import BetCard from '../components/BetCard';
-import CreateBetModal from '../components/CreateBetModal';
-import { useBets, useJoinBet } from '../lib/queries';
+import { getCurrentUser } from 'aws-amplify/auth';
+import { getActiveBets } from '../api';
 
 export default function Bets() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [bets, setBets] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
-  const { data: bets = [], isLoading } = useBets();
-  const joinBetMutation = useJoinBet();
+  useEffect(() => {
+    setLoading(true);
+    const fetchMyMarkets = async () => {
+      try {
+        const user = await getCurrentUser();
+        const response = await getActiveBets(user.userId);
+        console.log('API Response:', response);
+
+        if (Array.isArray(response.data)) {
+          setBets(response.data);
+        } else if (response.data && typeof response.data === 'object') {
+          setBets(Object.values(response.data));
+        } else {
+          setMessage('Invalid data format');
+        }
+      } catch (error) {
+        console.error('Error fetching active markets:', error);
+        setMessage('Error fetching active markets');
+      }
+
+      setLoading(false);
+    };
+
+    fetchMyMarkets();
+  }, []);
 
   const filteredBets = bets.filter((bet) => {
-    const categoryMatch = selectedCategory === 'all' || bet.category === selectedCategory;
     const statusMatch = selectedStatus === 'all' || bet.status === selectedStatus;
-    return categoryMatch && statusMatch;
+    return statusMatch;
   });
-
-  const handleJoinBet = async (betId: string) => {
-    try {
-      await joinBetMutation.mutateAsync(betId);
-    } catch (error) {
-      console.error('Failed to join bet:', error);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -50,18 +65,6 @@ export default function Bets() {
         <div className="flex items-center space-x-4 mb-4">
           <Filter className="w-5 h-5 text-gray-500" />
           <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            <option value="all">All Categories</option>
-            <option value="sports">Sports</option>
-            <option value="entertainment">Entertainment</option>
-            <option value="politics">Politics</option>
-            <option value="custom">Custom</option>
-          </select>
-
-          <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -77,18 +80,12 @@ export default function Bets() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredBets.map((bet) => (
             <BetCard
-              key={bet.id}
+              key={bet.bet_id}
               bet={bet}
-              onClick={() => handleJoinBet(bet.id)}
             />
           ))}
         </div>
       </div>
-
-      <CreateBetModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
     </div>
   );
 }
