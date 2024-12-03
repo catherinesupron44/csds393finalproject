@@ -43,30 +43,6 @@
 
    The application will now be running locally at `http://localhost:3000`. Open this URL in your browser.
 
-### AWS Setup
-
-BetBuddy uses **AWS Amplify** for the backend and **DynamoDB** for data storage. Follow these steps to set up the backend:
-
-1. Install the Amplify CLI if you haven’t already:
-   ```bash
-   npm install -g @aws-amplify/cli
-   ```
-
-2. Configure AWS Amplify:
-   ```bash
-   amplify configure
-   ```
-
-3. Initialize the backend:
-   ```bash
-   amplify init
-   ```
-
-4. Push changes to the cloud:
-   ```bash
-   amplify push
-   ```
-
 ## Usage
 
 ### Logging In
