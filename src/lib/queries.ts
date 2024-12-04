@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, CreateBetData, CreateGroupData } from './api';
+import { api, CreateBetData } from './api';
 import { useAuthStore } from './store';
 
 // Query keys
@@ -35,36 +35,6 @@ export function useJoinBet() {
     mutationFn: (betId: string) => api.joinBet(betId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bets });
-    },
-  });
-}
-
-export function useGroups() {
-  return useQuery({
-    queryKey: queryKeys.groups,
-    queryFn: api.getGroups,
-  });
-}
-
-export function useCreateGroup() {
-  const queryClient = useQueryClient();
-  const { profile } = useAuthStore();
-
-  return useMutation({
-    mutationFn: (data: CreateGroupData) => api.createGroup(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups });
-    },
-  });
-}
-
-export function useJoinGroup() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (groupId: string) => api.joinGroup(groupId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.groups });
     },
   });
 }

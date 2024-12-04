@@ -13,6 +13,8 @@ export default function CreateBetModal({ isOpen, onClose }: CreateBetModalProps)
   const [endDate, setEndDate] = useState('');
   const [stake, setStake] = useState('');
   const [category, setCategory] = useState('sports');
+  const [side, setSide] = useState('');  // New state for 'side'
+  const [amount, setAmount] = useState('');  // New state for 'amount'
 
   const createBetMutation = useCreateBet();
 
@@ -20,13 +22,29 @@ export default function CreateBetModal({ isOpen, onClose }: CreateBetModalProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Create the market_info object
+    const marketInfo = {
+      name: 'Test Market',  // This could be derived from the form or a static value
+      description: 'Test Description',  // This could be derived from the form or a static value
+      closing_date: endDate,  // Using the form value
+    };
+
+    const status = 'active';  // Assuming a default status
+    const betSide = side || 'Test Side';  // Using the 'side' from form or a default
+    const betAmount = parseInt(amount, 10) || 0;  // Parsing amount from form
+
     try {
       await createBetMutation.mutateAsync({
         title,
         description,
         endDate,
-        stake: parseInt(stake),
+        stake: parseInt(stake, 10),
         category,
+        market_info: marketInfo,
+        status,
+        side: betSide,
+        amount: betAmount,
       });
       onClose();
       // Reset form
@@ -35,6 +53,8 @@ export default function CreateBetModal({ isOpen, onClose }: CreateBetModalProps)
       setEndDate('');
       setStake('');
       setCategory('sports');
+      setSide('');
+      setAmount('');
     } catch (error) {
       console.error('Failed to create bet:', error);
     }
@@ -126,6 +146,35 @@ export default function CreateBetModal({ isOpen, onClose }: CreateBetModalProps)
               <option value="politics">Politics</option>
               <option value="custom">Custom</option>
             </select>
+          </div>
+
+          <div>
+            <label htmlFor="side" className="block text-sm font-medium text-gray-700 mb-1">
+              Side (Team/Choice)
+            </label>
+            <input
+              id="side"
+              type="text"
+              value={side}
+              onChange={(e) => setSide(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+              Amount (coins)
+            </label>
+            <input
+              id="amount"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              min="1"
+              required
+            />
           </div>
 
           <button

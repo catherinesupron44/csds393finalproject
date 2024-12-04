@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import { useState } from 'react';
+=======
+import React, { useState } from 'react';
+>>>>>>> Stashed changes
 import { X } from 'lucide-react';
 import { signUp, signIn, signInWithRedirect } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
@@ -6,9 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import config from '../amplifyconfiguration.json';
+
 Amplify.configure(config);
 const client = generateClient();
-
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,8 +21,6 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isSignUp, setIsSignUp] = useState(false);
-  
-
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -28,12 +30,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     passwordConfirmation: string;
     givenName: string;
   };
-  
+
   const [formData, setFormData] = useState<FormData>({
     email: '',
     newPassword: '',
     passwordConfirmation: '',
-    givenName: ''
+    givenName: '',
   });
 
   const handleChange = (data: string, value: any) => {
@@ -46,7 +48,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   if (!isOpen) return null;
 
   async function handleSignIn() {
-    const { email, newPassword} = formData;
+    const { email, newPassword } = formData;
     try {
       const { isSignedIn } = await signIn({ username: email, password: newPassword });
 
@@ -60,13 +62,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const handleSignUp = async () => {
     const { email, newPassword, givenName, passwordConfirmation } = formData;
-  
+
     if (newPassword !== passwordConfirmation) {
-      console.error("Passwords do not match");
+      console.error('Passwords do not match');
       setError('Error signing up: Passwords do not match');
       return;
     }
-  
+
     try {
       await signUp({
         username: email, // Use the email as the username
@@ -75,14 +77,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           userAttributes: {
             email: email,
             name: givenName,
-            // Add any other user attributes you want to set
           },
-          // optional
-          autoSignIn: true // or SignInOptions e.g { authFlowType: "USER_SRP_AUTH" }
-        }
+          autoSignIn: true, // Optional
+        },
       });
-  
-      navigate("/dashboard", { state: { email } });
+
+      navigate('/dashboard', { state: { email } });
     } catch (error: any) {
       console.error('Error signing up:', error);
       setError(`Error signing up: ${error.message}`);
@@ -103,69 +103,86 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           {isSignUp ? 'Create Account' : 'Welcome Back'}
         </h2>
 
-        <form onSubmit={(e) => {
-  e.preventDefault();
-  isSignUp ? handleSignUp() : handleSignIn();
-}} className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            isSignUp ? handleSignUp() : handleSignIn();
+          }}
+          className="space-y-4"
+        >
           <div>
-            <label 
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Email
             </label>
             <input
               id="email"
               type="email"
               value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
+              onChange={(e) => handleChange('email', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
           </div>
 
           <div>
-            <label 
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Password
             </label>
             <input
               id="password"
               type="password"
               value={formData.newPassword}
-              onChange={(e) => handleChange("newPassword", e.target.value)}
+              onChange={(e) => handleChange('newPassword', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
           </div>
 
           {isSignUp && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              value={formData.passwordConfirmation}
-              onChange={(e) => handleChange("passwordConfirmation", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div> )}
+            <div>
+              <label
+                htmlFor="confirm-password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Confirm Password
+              </label>
+              <input
+                id="confirm-password"
+                type="password"
+                value={formData.passwordConfirmation}
+                onChange={(e) =>
+                  handleChange('passwordConfirmation', e.target.value)
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+            </div>
+          )}
 
           {isSignUp && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              type="name"
-              value={formData.givenName}
-              onChange={(e) => handleChange("givenName", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div> )}
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={formData.givenName} // Bound to formData.givenName
+                onChange={(e) => handleChange('givenName', e.target.value)} // Updates formData.givenName
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                required
+              />
+            </div>
+          )}
 
           {error && (
             <div className="mt-4 p-3 text-sm text-red-500 bg-red-50 rounded-lg">
@@ -176,7 +193,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             type="button"
             className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-            onClick={() => signInWithRedirect({ provider: "Google" })}
+            onClick={() => signInWithRedirect({ provider: 'Google' })}
           >
             Google
           </button>

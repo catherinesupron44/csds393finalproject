@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useBets, useGroups, useCreateBet, useCreateGroup } from '../../lib/queries';
+import { useBets, useCreateBet} from '../../lib/queries';
 import { api } from '../../lib/api';
 
 jest.mock('../../lib/api');
@@ -38,28 +38,24 @@ describe('Query Hooks', () => {
     });
   });
 
-  describe('useGroups', () => {
-    it('fetches groups successfully', async () => {
-      const mockGroups = [{ id: '1', name: 'Test Group' }];
-      (api.getGroups as jest.Mock).mockResolvedValueOnce(mockGroups);
-
-      const { result } = renderHook(() => useGroups(), { wrapper });
-
-      await waitFor(() => {
-        expect(result.current.data).toEqual(mockGroups);
-      });
-    });
-  });
 
   describe('useCreateBet', () => {
     it('creates bet successfully', async () => {
-      const newBet = {
-        title: 'New Bet',
-        description: 'Description',
-        endDate: '2024-03-01',
-        stake: 100,
-        category: 'sports'
-      };
+      const newBet = await api.createBet({
+        title: 'Test Bet',
+        description: 'This is a test description for the bet.',
+        endDate: '2024-12-31T23:59:59Z',
+        stake: 50,
+        market_info: {
+          name: 'Test Market',
+          description: 'Test Description',
+          closing_date: '2024-12-31T23:59:59Z',
+        },
+        status: 'active',
+        side: 'Test Side',
+        amount: 100,
+        category: 'Sports',
+      });
       
       const mockResponse = { id: '1', ...newBet };
       (api.createBet as jest.Mock).mockResolvedValueOnce(mockResponse);
@@ -69,26 +65,6 @@ describe('Query Hooks', () => {
       await result.current.mutateAsync(newBet);
 
       expect(api.createBet).toHaveBeenCalledWith(newBet);
-    });
-  });
-
-  describe('useCreateGroup', () => {
-    it('creates group successfully', async () => {
-      const newGroup = {
-        name: 'New Group',
-        description: 'Description',
-        category: 'sports',
-        isPrivate: false
-      };
-      
-      const mockResponse = { id: '1', ...newGroup };
-      (api.createGroup as jest.Mock).mockResolvedValueOnce(mockResponse);
-
-      const { result } = renderHook(() => useCreateGroup(), { wrapper });
-
-      await result.current.mutateAsync(newGroup);
-
-      expect(api.createGroup).toHaveBeenCalledWith(newGroup);
     });
   });
 });
