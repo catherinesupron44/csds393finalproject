@@ -2,7 +2,6 @@ import { Trophy, Users, Star } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getCurrentUser } from 'aws-amplify/auth'; // Assuming you're using AWS Amplify for authentication
 
-
 interface LandingProps {
   onGetStarted: () => void;
 }

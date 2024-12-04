@@ -1,169 +1,87 @@
-<<<<<<< Updated upstream
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import AuthModal from '../../components/AuthModal';
-=======
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { signUp, signIn, signInWithRedirect } from 'aws-amplify/auth';
-import AuthModal from '../../components/AuthModal'; 
->>>>>>> Stashed changes
 import '@testing-library/jest-dom';
 
-
-// Mock dependencies
-jest.mock('aws-amplify/auth', () => ({
-  signUp: jest.fn(),
-  signIn: jest.fn(),
-  signInWithRedirect: jest.fn()
-}));
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => jest.fn()
-}));
-
-describe('AuthModal Component', () => {
+describe('AuthModal', () => {
   const mockOnClose = jest.fn();
-  const renderComponent = (isOpen = true, props = {}) => {
-    return render(
-      <MemoryRouter initialEntries={['/']}>
-        <Routes>
-          <Route 
-            path="/" 
-            element={
-              <AuthModal 
-                isOpen={isOpen} 
-                onClose={mockOnClose} 
-                {...props} 
-              />
-            } 
-          />
-          <Route path="/dashboard" element={<div>Dashboard</div>} />
-        </Routes>
-      </MemoryRouter>
-    );
-  };
+  const mockOnLogin = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('renders sign in modal by default', () => {
-    renderComponent();
-
+  it('renders sign in form by default', () => {
+    render(
+      <AuthModal 
+        isOpen={true} 
+        onClose={mockOnClose} 
+        onLogin={mockOnLogin} 
+      />
+    );
+    
     expect(screen.getByText('Welcome Back')).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.getByText('Sign In')).toBeInTheDocument();
   });
 
-  test('switches to sign up mode', () => {
-    renderComponent();
-
-    const switchToSignUpButton = screen.getByText("Don't have an account? Sign up");
-    fireEvent.click(switchToSignUpButton);
-
+  it('toggles between sign in and sign up', async () => {
+    render(
+      <AuthModal 
+        isOpen={true} 
+        onClose={mockOnClose} 
+        onLogin={mockOnLogin} 
+      />
+    );
+    
+    await userEvent.click(screen.getByText("Don't have an account? Sign up"));
     expect(screen.getByText('Create Account')).toBeInTheDocument();
-    expect(screen.getByLabelText('Confirm Password')).toBeInTheDocument();
-    expect(screen.getByLabelText('Name')).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'New User' } });
-  });
-
-  test('handles sign in successfully', async () => {
-    (signIn as jest.Mock).mockResolvedValue({ isSignedIn: true });
-
-    renderComponent();
-
-    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
-    fireEvent.click(screen.getByText('Sign In'));
-
-    await waitFor(() => {
-      expect(signIn).toHaveBeenCalledWith({
-        username: 'test@example.com',
-        password: 'password123'
-      });
-    });
-  });
-
-  test('handles sign up successfully', async () => {
-    (signUp as jest.Mock).mockResolvedValue({});
-
-    renderComponent();
-
-    // Switch to sign up
-    const switchToSignUpButton = screen.getByText("Don't have an account? Sign up");
-    fireEvent.click(switchToSignUpButton);
-
-    // Fill out sign up form
-    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'newuser@example.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'New User' } });
     
-    fireEvent.click(screen.getByText('Sign Up'));
-
-    await waitFor(() => {
-      expect(signUp).toHaveBeenCalledWith({
-        username: 'newuser@example.com',
-        password: 'password123',
-        options: {
-          userAttributes: {
-            email: 'newuser@example.com',
-            name: 'New User'
-          },
-          autoSignIn: true
-        }
-      });
-    });
+    await userEvent.click(screen.getByText('Already have an account? Sign in'));
+    expect(screen.getByText('Welcome Back')).toBeInTheDocument();
   });
 
-  test('shows error when passwords do not match', async () => {
-    renderComponent();
-  
-    // Switch to sign up
-    const switchToSignUpButton = screen.getByText("Don't have an account? Sign up");
-    fireEvent.click(switchToSignUpButton);
-  
-    // Fill out form with mismatched passwords
-    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'newuser@example.com' } });
-    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'differentpassword' } });
-    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'New User' } });
+  it('calls onLogin with form data when submitted', async () => {
+    render(
+      <AuthModal 
+        isOpen={true} 
+        onClose={mockOnClose} 
+        onLogin={mockOnLogin} 
+      />
+    );
     
-    fireEvent.click(screen.getByText('Sign Up'));
-  
-    await waitFor(() => {
-      expect(screen.getByText(/Error signing up: Passwords do not match/i)).toBeInTheDocument();
-
+    await userEvent.type(screen.getByLabelText('Email'), 'test@example.com');
+    await userEvent.type(screen.getByLabelText('Password'), 'password123');
     
-    });
-  });
-  
-
-  test('handles Google sign in redirect', () => {
-    renderComponent();
-
-    const googleSignInButton = screen.getByText('Google');
-    fireEvent.click(googleSignInButton);
-
-    expect(signInWithRedirect).toHaveBeenCalledWith({ provider: "Google" });
+    fireEvent.submit(screen.getByRole('button', { name: 'Sign In' }));
+    
+    expect(mockOnLogin).toHaveBeenCalledWith('test@example.com', 'password123');
   });
 
-  test('closes modal when close button is clicked', () => {
-    renderComponent();
-
-    const closeButton = screen.getByRole('button', { name: '' }); // X button has no text
-    fireEvent.click(closeButton);
-
-    expect(mockOnClose).toHaveBeenCalled();
+  it('calls onClose when close button is clicked', async () => {
+    render(
+      <AuthModal 
+        isOpen={true} 
+        onClose={mockOnClose} 
+        onLogin={mockOnLogin} 
+      />
+    );
+    
+    await userEvent.click(screen.getByRole('button', { name: '' })); // Close button
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  test('does not render when isOpen is false', () => {
-    const { container } = renderComponent(false);
-    expect(container.firstChild).toBeNull();
+  it('does not render when isOpen is false', () => {
+    render(
+      <AuthModal 
+        isOpen={false} 
+        onClose={mockOnClose} 
+        onLogin={mockOnLogin} 
+      />
+    );
+    
+    expect(screen.queryByText('Welcome Back')).not.toBeInTheDocument();
   });
 });

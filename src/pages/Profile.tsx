@@ -1,12 +1,4 @@
-<<<<<<< Updated upstream
 import React, { useEffect, useState } from 'react';
-=======
-import { useState, useEffect } from 'react';
-import { Plus, Filter } from 'lucide-react';
-import BetCard from '../components/BetCard';
-import { getCurrentUser } from 'aws-amplify/auth';
-import { getBetHistory } from '../api';
->>>>>>> Stashed changes
 
 export default function BetHistory() {
   const [bets, setBets] = useState([]);

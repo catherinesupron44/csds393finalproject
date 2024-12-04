@@ -9,15 +9,6 @@ export interface Bet {
   participants: number;
   stake: number;
   category: string;
-  amount: number;
-  side: string;
-
-  // Nested market_info object
-  market_info: {
-    name: string;
-    description: string;
-    closing_date: string;
-  };
 }
 
 interface BetCardProps {
@@ -33,37 +24,17 @@ export default function BetCard({ bet, onClick }: BetCardProps) {
     expired: 'bg-red-100 text-red-800',
   };
 
-<<<<<<< Updated upstream
-=======
-  // Explicitly type datetime as a string or Date
-  const formatDateTime = (datetime: string | Date) => {
-    const date = new Date(datetime);
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    return date.toLocaleDateString('en-US', options);
-  };
-
->>>>>>> Stashed changes
   return (
-    <div
+    <div 
       onClick={onClick}
       className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
-      data-testid="bet-card"
     >
       <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="font-semibold text-gray-900">{bet.title}</h3>
           <p className="text-sm text-gray-600 mt-1">{bet.description}</p>
         </div>
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[bet.status]}`}
-        >
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[bet.status]}`}>
           {bet.status.charAt(0).toUpperCase() + bet.status.slice(1)}
         </span>
       </div>
