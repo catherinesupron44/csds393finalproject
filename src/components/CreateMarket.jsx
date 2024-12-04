@@ -15,6 +15,8 @@ const CreateMarket = () => {
     }
   };
 
+  const isButtonDisabled = !name || !description;
+
   return (
     <div>
       <h2>Create Market</h2>
@@ -28,7 +30,9 @@ const CreateMarket = () => {
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Description"
       />
-      <button onClick={handleCreateMarket}>Create Market</button>
+      <button onClick={handleCreateMarket} disabled={isButtonDisabled}>
+        Create Market
+      </button>
       <p>{message}</p>
     </div>
   );

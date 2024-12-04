@@ -5,7 +5,14 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*"]
+    },
     "jsx": "react-jsx",
-    "types": ["jest", "@testing-library/jest-dom"]
-  }
+    "types": ["jest", "@testing-library/jest-dom"],
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "tests/**/*"],
 }

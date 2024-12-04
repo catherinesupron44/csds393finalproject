@@ -1,10 +1,12 @@
 //signup
+import React from 'react';
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { signInWithRedirect} from "aws-amplify/auth";
+import { signInWithRedirect } from "aws-amplify/auth";
 import { signUp } from 'aws-amplify/auth';
 import { motion } from "framer-motion";
+
 export default function SignUp() {
   const navigate = useNavigate();
 
@@ -18,7 +20,6 @@ export default function SignUp() {
   });
 
   const handleChange = (e) => {
-   
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -26,18 +27,17 @@ export default function SignUp() {
   };
 
   const handleSignUp = async (e) => {
-   
     e.preventDefault();
     const { email, newPassword, givenName } = formData;
-  
+
     if (newPassword !== formData.passwordConfirmation) {
       console.error("Passwords do not match");
       setError('Error signing up: Passwords do not match');
       return;
     }
-  
+
     try {
-     await signUp({
+      await signUp({
         username: email, // Use the email as the username
         password: newPassword,
         options: {
@@ -48,43 +48,35 @@ export default function SignUp() {
           autoSignIn: true // or SignInOptions e.g { authFlowType: "USER_SRP_AUTH" }
         }
       });
-     
-      navigate("/home", {state: {email: email}});
-  
-      
-    
+
+      navigate("/home", { state: { email: email } });
     } catch (error) {
       console.log('error signing up:', error);
       setError('Error signing up: ' + error.message);
-
     }
   };
-  
-
 
   return (
     <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.75, ease: "easeInOut" }}
-  >
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.75, ease: "easeInOut" }}
+    >
       <div className="flex flex-col flex-1 min-h-full justify-center px-6 py-8 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col items-center justify-center">
           <a href="/">
-
-          <h2 className="mt-4 leading-9 text-center text-2xl font-bold tracking-tight text-black">
-            Sign Up
-          </h2>
+            <h2 className="mt-4 leading-9 text-center text-2xl font-bold tracking-tight text-black">
+              Sign Up
+            </h2>
           </a>
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-[520px]">
           <div className="bg-white px-6 py-12 shadow sm:rounded-3xl sm:px-12">
             <form className="space-y-6" onSubmit={handleSignUp}>
-           
-            <div>
+              <div>
                 <label
-                  htmlFor="name"
+                  htmlFor="givenName" // Match the id of the input
                   className="block text-sm font-medium leading-6 text-black"
                 >
                   Name
@@ -94,10 +86,9 @@ export default function SignUp() {
                     value={formData.givenName}
                     onChange={handleChange}
                     className="block sm:text-sm sm:leading-6 w-full rounded-full py-1.5 text-black shadow-sm ring-1 ring-owl-purple border-0
-                          focus:ring-2 focus:ring-inset ring-inset focus:ring-owl-purple
-                          "
+                          focus:ring-2 focus:ring-inset ring-inset focus:ring-owl-purple"
                     type="text"
-                    id="givenName"
+                    id="givenName" // Ensure this matches the htmlFor above
                     name="givenName"
                     autoComplete="name"
                     required
@@ -116,8 +107,7 @@ export default function SignUp() {
                     value={formData.email}
                     onChange={handleChange}
                     className="block sm:text-sm sm:leading-6 w-full rounded-full py-1.5 text-black shadow-sm ring-1 ring-owl-purple border-0
-                          focus:ring-2 focus:ring-inset ring-inset focus:ring-owl-purple
-                          "
+                          focus:ring-2 focus:ring-inset ring-inset focus:ring-owl-purple"
                     type="email"
                     id="email"
                     name="email"
@@ -131,7 +121,7 @@ export default function SignUp() {
                 <div className="flex justify-between text-center">
                   <label
                     htmlFor="newPassword"
-                    className="block text-sm font-medium leading 6 text-black"
+                    className="block text-sm font-medium leading-6 text-black"
                   >
                     Create Password
                   </label>
@@ -154,7 +144,7 @@ export default function SignUp() {
               <div>
                 <label
                   htmlFor="passwordConfirmation"
-                  className="block text-sm font-medium leading 6 text-black"
+                  className="block text-sm font-medium leading-6 text-black"
                 >
                   Confirm Password
                 </label>
@@ -173,7 +163,7 @@ export default function SignUp() {
                 </div>
               </div>
               <div>
-              {error && <div className="text-red-500 mb-4">{error}</div>}
+                {error && <div className="text-red-500 mb-4">{error}</div>}
 
                 <button
                   type="submit"
@@ -225,6 +215,6 @@ export default function SignUp() {
           </Link>
         </div>
       </div>
-      </motion.div>
+    </motion.div>
   );
 }

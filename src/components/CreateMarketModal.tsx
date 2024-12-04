@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useCreateBet } from '../lib/queries';
 import { createMarket } from '../api';
@@ -6,10 +6,14 @@ import { createMarket } from '../api';
 interface CreateMarketModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUser: any
+  currentUser: any;
 }
 
-export default function CreateMarketModal({ isOpen, onClose, currentUser }: CreateMarketModalProps) {
+export default function CreateMarketModal({
+  isOpen,
+  onClose,
+  currentUser,
+}: CreateMarketModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [closing_date, setEndDate] = useState('');
@@ -20,23 +24,37 @@ export default function CreateMarketModal({ isOpen, onClose, currentUser }: Crea
   const [sideOneOdds, setSideOneOdds] = useState(100);
   const [sideTwoOdds, setSideTwoOdds] = useState(100);
 
-
   const createBetMutation = useCreateBet();
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreateMarket = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Ensure the odds are properly parsed as numbers and avoid concatenation
+    const parsedSideOneOdds = parseFloat(sideOneOdds.toString());
+    const parsedSideTwoOdds = parseFloat(sideTwoOdds.toString());
+
+    // Validate the odds are valid numbers before proceeding
+    if (isNaN(parsedSideOneOdds) || isNaN(parsedSideTwoOdds)) {
+      console.error('Invalid odds values');
+      return;
+    }
+
+    const sides = { sideOne, sideTwo };
+    const odds = { sideOne: parsedSideOneOdds, sideTwo: parsedSideTwoOdds };
+
     try {
-      await createBetMutation.mutateAsync({
+      await createMarket(
+        currentUser.userId,
         title,
         description,
-        closing_date,
-        stake: parseInt(stake),
-        category,
-      });
+        sides,
+        odds,
+        closing_date
+      );
       onClose();
-      // Reset form
+      // Reset form after submission
       setTitle('');
       setDescription('');
       setEndDate('');
@@ -47,21 +65,7 @@ export default function CreateMarketModal({ isOpen, onClose, currentUser }: Crea
       setSideOneOdds(100);
       setSideTwoOdds(100);
     } catch (error) {
-      console.error('Failed to create bet:', error);
-    }
-  };
-
-  const handleCreateMarket = async () => {
-    try {
-      const sides = {'sideOne' : sideOne, 'sideTwo' : sideTwo};
-      const odds = {'sideOne' : sideOneOdds, 'sideTwo' : sideTwoOdds}
-      console.log(currentUser);
-      const response = await createMarket(currentUser.userId, title, description, sides, odds, closing_date);
-      console.log(response);
-      //console.log(`Market created with ID: ${response.data.market_id}`);
-    } catch (error) {
-      console.log(error);
-      console.log('Error creating market');
+      console.error('Error creating market:', error);
     }
   };
 
@@ -77,7 +81,7 @@ export default function CreateMarketModal({ isOpen, onClose, currentUser }: Crea
 
         <h2 className="text-2xl font-bold text-center mb-6">Create New Market</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleCreateMarket} className="space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
               Title
@@ -121,7 +125,7 @@ export default function CreateMarketModal({ isOpen, onClose, currentUser }: Crea
           </div>
 
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="sideOne" className="block text-sm font-medium text-gray-700 mb-1">
               Side 1
             </label>
             <input
@@ -135,21 +139,21 @@ export default function CreateMarketModal({ isOpen, onClose, currentUser }: Crea
           </div>
 
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="sideOneOdds" className="block text-sm font-medium text-gray-700 mb-1">
               Side 1 Odds
             </label>
             <input
               id="sideOneOdds"
-              type="int"
+              type="number"
               value={sideOneOdds}
-              onChange={(e) => setSideOneOdds(e.target.value)}
+              onChange={(e) => setSideOneOdds(parseFloat(e.target.value))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="sideTwo" className="block text-sm font-medium text-gray-700 mb-1">
               Side 2
             </label>
             <input
@@ -163,14 +167,14 @@ export default function CreateMarketModal({ isOpen, onClose, currentUser }: Crea
           </div>
 
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="sideTwoOdds" className="block text-sm font-medium text-gray-700 mb-1">
               Side 2 Odds
             </label>
             <input
               id="sideTwoOdds"
-              type="int"
+              type="number"
               value={sideTwoOdds}
-              onChange={(e) => setSideTwoOdds(e.target.value)}
+              onChange={(e) => setSideTwoOdds(parseFloat(e.target.value))}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
@@ -178,7 +182,6 @@ export default function CreateMarketModal({ isOpen, onClose, currentUser }: Crea
 
           <button
             type="submit"
-            onClick={handleCreateMarket}
             disabled={createBetMutation.isPending}
             className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-400"
           >

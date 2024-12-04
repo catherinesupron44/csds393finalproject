@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { Home, Users, TrendingUp, User, DollarSign } from 'lucide-react';
 import { getCurrentUser, signOut } from "aws-amplify/auth";
-import '../pages/homepage.css';
+//import '../pages/homepage.css';
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState(null);

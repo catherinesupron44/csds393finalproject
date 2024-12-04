@@ -1,8 +1,10 @@
-import { useState, useEffect} from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Plus, Filter } from 'lucide-react';
 import BetCard from '../components/BetCard';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { getBetHistory } from '../api';
+
 
 export default function Bets() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
