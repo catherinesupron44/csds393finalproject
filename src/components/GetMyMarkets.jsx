@@ -105,7 +105,61 @@ const GetMyMarkets = () => {
 
 // MarketTile component remains the same as in the previous implementation
 const MarketTile = ({ market, onSettleMarket }) => {
-  // ... (previous implementation)
+  const formatDateTime = (datetime) => {
+    const date = new Date(datetime);
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
+    return date.toLocaleDateString('en-US', options);
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
+      {market.settled === 'to be settled' && (
+        <button
+          onClick={() => onSettleMarket(market)} // Trigger the settle modal
+          className="absolute top-4 right-4 bg-indigo-600 text-white text-sm font-medium py-1 px-3 rounded hover:bg-indigo-700 transition"
+        >
+          Settle Market
+        </button>
+      )}
+
+      <h3 className="font-semibold text-lg mb-2">{market.name || 'Unnamed Market'}</h3>
+      <p className="text-sm text-gray-600 mb-4">{market.description || 'No description'}</p>
+
+      <div className="grid grid-cols-2 gap-4 text-center">
+        <div>
+          <p className="font-medium">{market.sides?.sideOne || 'N/A'}</p>
+          <p className="text-sm text-gray-500">Odds: {market.odds?.sideOne || 'N/A'}</p>
+        </div>
+        <div>
+          <p className="font-medium">{market.sides?.sideTwo || 'N/A'}</p>
+          <p className="text-sm text-gray-500">Odds: {market.odds?.sideTwo || 'N/A'}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 text-sm text-gray-600">
+      <p>
+    <strong>Status:</strong>{' '}
+    {market.settled === true
+      ? 'Settled'
+      : market.settled === false
+      ? 'Not Settled'
+      : market.settled === 'to be settled'
+      ? 'To Be Settled'
+      : 'Unknown'}
+  </p>
+        <p>
+          <strong>Closes:</strong> {market.closing_date ? formatDateTime(market.closing_date) : 'Unknown'}
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default GetMyMarkets;
