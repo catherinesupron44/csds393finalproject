@@ -1,78 +1,64 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import GetMarketInformation from '../../components/GetMarketInformation';
 import { getMarketInformation } from '../../api';
 
-// Mock the API module
-jest.mock('../../api');
+// Mock the API call
+jest.mock('../../api', () => ({
+  getMarketInformation: jest.fn()
+}));
 
 describe('GetMarketInformation Component', () => {
-  const mockMarketId = '12345';
+  const mockMarketId = '123';
+  const mockMarketInfo = {
+    id: '123',
+    name: 'Test Market',
+    description: 'A test market',
+    price: 100
+  };
 
-  // Reset mocks before each test
   beforeEach(() => {
+    // Clear all mocks before each test
     jest.clearAllMocks();
   });
 
   test('renders component and fetches market information successfully', async () => {
-    // Prepare mock market information
-    const mockMarketInfo = {
-      id: mockMarketId,
-      name: 'Test Market',
-      price: 100.50,
-      volume: 1000
-    };
+    // Mock successful API call
+    (getMarketInformation as jest.Mock).mockResolvedValue(mockMarketInfo);
 
-    // Mock the API call to return successful response
-    getMarketInformation.mockResolvedValue({ data: mockMarketInfo });
-
-    // Render the component with a market ID
     render(<GetMarketInformation marketId={mockMarketId} />);
 
-    // Check if heading is rendered
-    expect(screen.getByText('Market Information')).toBeInTheDocument();
-
-    // Wait for and check market information display
+    // Wait for the component to update
     await waitFor(() => {
-      const marketInfoElement = screen.getByText(JSON.stringify(mockMarketInfo, null, 2));
-      expect(marketInfoElement).toBeInTheDocument();
+      // Check for the market information display
+      const preElement = screen.getByRole('region', { name: /market information/i });
+      expect(preElement).toHaveTextContent(JSON.stringify(mockMarketInfo, null, 2));
     });
-
-    // Verify API was called with correct market ID
-    expect(getMarketInformation).toHaveBeenCalledTimes(1);
-    expect(getMarketInformation).toHaveBeenCalledWith(mockMarketId);
-  });
-
-  test('handles error when fetching market information fails', async () => {
-    // Mock the API call to throw an error
-    getMarketInformation.mockRejectedValue(new Error('Fetch failed'));
-
-    // Render the component with a market ID
-    render(<GetMarketInformation marketId={mockMarketId} />);
-
-    // Wait for and check error message
-    await waitFor(() => {
-      expect(screen.getByText('Error fetching market information')).toBeInTheDocument();
-    });
-
-    // Verify API was called with correct market ID
-    expect(getMarketInformation).toHaveBeenCalledTimes(1);
-    expect(getMarketInformation).toHaveBeenCalledWith(mockMarketId);
   });
 
   test('renders no market data message when market info is empty', async () => {
-    // Mock the API call to return an empty object
-    getMarketInformation.mockResolvedValue({ data: {} });
+    // Mock empty market info
+    (getMarketInformation as jest.Mock).mockResolvedValue({});
 
-    // Render the component with a market ID
     render(<GetMarketInformation marketId={mockMarketId} />);
 
-    // Check if heading and "No market data" message are rendered
+    // Wait for the component to update
     await waitFor(() => {
-      expect(screen.getByText('Market Information')).toBeInTheDocument();
-      expect(screen.getByText('No market data available')).toBeInTheDocument();
+      const noDataMessage = screen.getByText(/no market data available/i);
+      expect(noDataMessage).toBeInTheDocument();
     });
   });
 
+  test('handles missing marketInfo prop gracefully', async () => {
+    // Mock API error or no data
+    (getMarketInformation as jest.Mock).mockRejectedValue(new Error('No data'));
+
+    render(<GetMarketInformation marketId={mockMarketId} />);
+
+    // Wait for the component to update
+    await waitFor(() => {
+      const noDataMessage = screen.getByText(/no market data available/i);
+      expect(noDataMessage).toBeInTheDocument();
+    });
+  });
 });

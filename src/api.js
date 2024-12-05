@@ -3,6 +3,7 @@ import axios from 'axios';
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
 const authToken = import.meta.env.VITE_REACT_APP_AUTH_TOKEN;
 
+
 // Bets Endpoints
 export const createMarket = async (userId, title, description, sides, odds, closing_date ) => 
     await axios.post(

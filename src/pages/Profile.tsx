@@ -28,8 +28,8 @@ export default function Bets() {
           setMessage('Invalid data format');
         }
       } catch (error) {
-        console.error('Error fetching active markets:', error);
-        setMessage('Error fetching active markets');
+        console.error('Error fetching bet history:', error);
+        setMessage('Error fetching bet history');
       }
 
       setLoading(false);
