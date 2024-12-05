@@ -1,7 +1,12 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_BASE_URL;
-const authToken = import.meta.env.VITE_REACT_APP_AUTH_TOKEN;
+const API_BASE_URL = 
+  (typeof process !== 'undefined' && process.env.VITE_REACT_APP_API_BASE_URL) || 
+  import.meta.env.VITE_REACT_APP_API_BASE_URL;
+
+const authToken = 
+  (typeof process !== 'undefined' && process.env.VITE_REACT_APP_AUTH_TOKEN) || 
+  import.meta.env.VITE_REACT_APP_AUTH_TOKEN;
 
 
 // Bets Endpoints
