@@ -1,75 +1,69 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Bets from '../../pages/Bets';
+import React from 'react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { api } from '../../lib/api';
+import Bets from '../../pages/Bets';
+import { getCurrentUser } from 'aws-amplify/auth';
+import { getBetHistory } from '../../api';
 
-/**
- * @jest-environment node
- */
+// Mock dependencies
+jest.mock('aws-amplify/auth', () => ({
+  getCurrentUser: jest.fn(),
+}));
 
-jest.mock('../../lib/api');
+jest.mock('../../api', () => ({
+  getBetHistory: jest.fn(),
+}));
 
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: false } },
-});
-
+const mockUser = { userId: 'user123' };
 const mockBets = [
-  {
-    id: '1',
-    title: 'Test Bet 1',
-    description: 'Description 1',
-    status: 'active',
-    endDate: '2024-03-01',
-    participants: 5,
-    stake: 100,
-    category: 'sports'
-  },
-  {
-    id: '2',
-    title: 'Test Bet 2',
-    description: 'Description 2',
-    status: 'pending',
-    endDate: '2024-03-02',
-    participants: 3,
-    stake: 50,
-    category: 'entertainment'
-  }
+  { bet_id: '1', title: 'Bet 1', status: 'active' },
+  { bet_id: '2', title: 'Bet 2', status: 'completed' },
 ];
 
-describe('Bets Page', () => {
+describe('Bets Component', () => {
   beforeEach(() => {
-    (api.getBets as jest.Mock).mockResolvedValue(mockBets);
-    queryClient.clear();
+    jest.clearAllMocks();
   });
 
-  it('renders bets list', async () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <Bets />
-      </QueryClientProvider>
-    );
+  test('fetches and renders bets successfully', async () => {
+    // Set up mock resolved values
+    (getCurrentUser as jest.Mock).mockResolvedValue(mockUser);
+    (getBetHistory as jest.Mock).mockResolvedValue({ data: mockBets });
 
-    await waitFor(() => {
-      expect(screen.getByText('Test Bet 1')).toBeInTheDocument();
-      expect(screen.getByText('Test Bet 2')).toBeInTheDocument();
+    render(<Bets />);
+
+    // Ensure the loading spinner is shown initially
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+
+    // Wait for the data to be fetched and rendered
+    await act(async () => {
+      await waitFor(() => {
+        const betCards = screen.getAllByTestId('bet-card');
+        expect(betCards).toHaveLength(mockBets.length);
+        expect(betCards[0]).toHaveTextContent('Bet 1');
+        expect(betCards[1]).toHaveTextContent('Bet 2');
+      });
     });
+
+    // Verify API calls
+    expect(getCurrentUser).toHaveBeenCalledTimes(1);
+    expect(getBetHistory).toHaveBeenCalledWith(mockUser.userId);
   });
 
+  test('displays error message if API call fails', async () => {
+    // Set up mock resolved/rejected values
+    (getCurrentUser as jest.Mock).mockResolvedValue(mockUser);
+    (getBetHistory as jest.Mock).mockRejectedValue(new Error('Error fetching bets'));
 
-  it('opens create bet modal', async () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <Bets />
-      </QueryClientProvider>
-    );
+    render(<Bets />);
 
-    const createBetButton = await waitFor(() =>
-        screen.getByRole('button', { name: /Create Bet/i })
-      );
-    
-      await userEvent.click(createBetButton);
-      expect(screen.getByText('Create New Bet')).toBeInTheDocument();
+    // Wait for error message to appear
+    await waitFor(() => {
+      expect(screen.getByText(/error fetching active markets/i)).toBeInTheDocument();
+    });
+
+    // Verify API calls
+    expect(getCurrentUser).toHaveBeenCalledTimes(1);
+    expect(getBetHistory).toHaveBeenCalledWith(mockUser.userId);
   });
 });

@@ -1,5 +1,4 @@
-import { Bet } from '../components/BetCard';
-import { Group } from '../components/GroupCard';
+import { Bet } from "../components/BetCard";  // Import Bet interface
 
 // Types
 export interface CreateBetData {
@@ -7,14 +6,15 @@ export interface CreateBetData {
   description: string;
   endDate: string;
   stake: number;
+  market_info: {
+    name: string;
+    description: string;
+    closing_date: string;
+  };
+  status: 'active' | 'pending' | 'completed' | 'expired';
+  side: string;
+  amount: number;
   category: string;
-}
-
-export interface CreateGroupData {
-  name: string;
-  description: string;
-  category: string;
-  isPrivate: boolean;
 }
 
 // Mock database
@@ -28,18 +28,13 @@ let bets: Bet[] = [
     participants: 8,
     stake: 100,
     category: 'sports',
-  }
-];
-
-let groups: Group[] = [
-  {
-    id: '1',
-    name: 'Sports Enthusiasts',
-    description: 'A group for discussing and betting on major sporting events',
-    memberCount: 24,
-    activeBets: 8,
-    category: 'sports',
-    lastActivity: '2h ago',
+    amount: 100,
+    side: 'Kansas City Chiefs',
+    market_info: {
+      name: 'Super Bowl LVIII',
+      description: 'Kansas City Chiefs vs San Francisco 49ers',
+      closing_date: '2024-02-11T23:59:59Z'
+    },
   }
 ];
 
@@ -57,12 +52,11 @@ export const api = {
   async createBet(data: CreateBetData): Promise<Bet> {
     await delay(500);
     const newBet: Bet = {
-      id: String(Date.now()),
+      id: String(Date.now()),  // Generate a unique ID based on timestamp
       ...data,
-      status: 'active',
       participants: 1,
     };
-    bets = [...bets, newBet];
+    bets = [...bets, newBet];  // Add the new bet to the mock database
     return newBet;
   },
 
@@ -74,35 +68,5 @@ export const api = {
         : bet
     );
     return bets.find(bet => bet.id === betId)!;
-  },
-
-  // Groups
-  async getGroups(): Promise<Group[]> {
-    await delay(500);
-    return groups;
-  },
-
-  async createGroup(data: CreateGroupData): Promise<Group> {
-    await delay(500);
-    const newGroup: Group = {
-      id: String(Date.now()),
-      ...data,
-      name: data.name,
-      memberCount: 1,
-      activeBets: 0,
-      lastActivity: 'Just now',
-    };
-    groups = [...groups, newGroup];
-    return newGroup;
-  },
-
-  async joinGroup(groupId: string): Promise<Group> {
-    await delay(500);
-    groups = groups.map(group =>
-      group.id === groupId
-        ? { ...group, memberCount: group.memberCount + 1, lastActivity: 'Just now' }
-        : group
-    );
-    return groups.find(group => group.id === groupId)!;
-  },
+  }
 };
