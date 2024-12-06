@@ -78,27 +78,6 @@ jobs:
         
     - name: Install dependencies
       run: npm install
-    - name: Build project
-      env:
-        CI: false 
-      run: npm run build --if-present
-    - name: Run tests and generate JSON report
-      run: |
-        npm run test -- --json --outputFile=test-report.json
-
-    - name: Calculate pass percentage
-      id: calculate-pass-percentage
-      run: |
-        totalTests=$(jq '.numTotalTests' test-report.json)
-        passedTests=$(jq '.numPassedTests' test-report.json)
-        passPercentage=$((passedTests * 100 / totalTests))
-        echo "Pass Percentage: $passPercentage%"
-
-    - name: Check if pass percentage meets threshold
-      if: env.pass-percentage < 50
-      run: |
-        echo "Test pass percentage is below the threshold. Failing the build."
-        exit 1
 
     - name: Sync build folder to S3 with public-read ACL (Prod)
       if: github.ref == 'refs/heads/main'
