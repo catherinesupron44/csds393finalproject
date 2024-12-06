@@ -79,6 +79,11 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Build project
+      env:
+        CI: false 
+      run: npm run build
+
     - name: Sync build folder to S3 with public-read ACL (Prod)
       if: github.ref == 'refs/heads/main'
       run: |
