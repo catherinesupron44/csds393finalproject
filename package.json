@@ -1,5 +1,5 @@
 {
-  "name": "betbuddy",
+  "name": "searchowl",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -14,6 +14,7 @@
     "/node_modules/"
   ],
   "dependencies": {
+    "@calcom/embed-react": "^1.5.2",
     "@nextui-org/react": "^2.4.8",
     "@tanstack/react-query": "^5.62.2",
     "aws-amplify": "^6.6.6",
