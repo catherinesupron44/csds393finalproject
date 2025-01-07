@@ -1,0 +1,98 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Landing Component matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="container mx-auto px-4 py-16 text-center"
+  >
+    <h1
+      class="text-5xl font-bold text-indigo-900 mb-6"
+    >
+      Welcome to BetBuddy
+    </h1>
+    <p
+      class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
+    >
+      Track friendly bets and compete with friends - all without real money stakes!
+    </p>
+    <button
+      class="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors"
+    >
+      Get Started
+    </button>
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16"
+    >
+      <div
+        class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div
+          class="flex justify-center mb-4"
+        >
+          <div
+            data-testid="trophy-icon"
+          >
+            Trophy
+          </div>
+        </div>
+        <h3
+          class="text-xl font-semibold text-gray-900 mb-2"
+        >
+          Track Your Wins
+        </h3>
+        <p
+          class="text-gray-600"
+        >
+          Effortlessly track your winnings and losses as you rise to the top.
+        </p>
+      </div>
+      <div
+        class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div
+          class="flex justify-center mb-4"
+        >
+          <div
+            data-testid="users-icon"
+          >
+            Users
+          </div>
+        </div>
+        <h3
+          class="text-xl font-semibold text-gray-900 mb-2"
+        >
+          Join Exciting Markets
+        </h3>
+        <p
+          class="text-gray-600"
+        >
+          Get in on the action by creating or joining markets that match your interests.
+        </p>
+      </div>
+      <div
+        class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div
+          class="flex justify-center mb-4"
+        >
+          <div
+            data-testid="star-icon"
+          >
+            Star
+          </div>
+        </div>
+        <h3
+          class="text-xl font-semibold text-gray-900 mb-2"
+        >
+          Bet, Compete & Win
+        </h3>
+        <p
+          class="text-gray-600"
+        >
+          Challenge friends, place your bets, and prove you’ve got the best instincts.
+        </p>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

@@ -1,0 +1,87 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: Install Amplify CLI
+      run: npm install -g @aws-amplify/cli
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+    - name: Pull .env file from Secrets Manager
+      run: |
+          aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:us-east-2:242201278717:secret:web/.env-a1e2U2 --query SecretString --output text > .env
+      env:
+          AWS_REGION: us-east-2
+
+    - name: Amplify Pull Headless
+      env:
+          AMPLIFY: |
+            {
+              "projectName": "websitedev",
+              "appId": "dfl9ftbpv0ezp",
+              "envName": "dev",
+              "defaultEditor": "code"
+            }
+          FRONTEND: |
+            {
+              "frontend": "javascript",
+              "framework": "react",
+              "config": {
+                "SourceDir": "src",
+                "DistributionDir": "dist",
+                "BuildCommand": "npm run build",
+                "StartCommand": "npm run dev"
+              }
+            }
+          PROVIDERS: |
+            {
+              "awscloudformation": {
+                "configLevel": "project",
+                "useProfile": false,
+                "profileName": "default",
+                "accessKeyId": "${{ secrets.AWS_ACCESS_KEY_ID }}",
+                "secretAccessKey": "${{ secrets.AWS_SECRET_ACCESS_KEY }}",
+                "region": "us-east-2"
+              }
+            }
+      run: |
+        amplify pull --appId d1lx3x1gdxpv17 --envName dev --amplify "$AMPLIFY" --frontend "$FRONTEND" --providers "$PROVIDERS" --yes --debug
+        
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project
+      env:
+        CI: false 
+      run: npm run build
+
+    - name: Sync build folder to S3 with public-read ACL (Prod)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        aws s3 sync dist/ s3://betbuddy-prod --delete --acl public-read
+      env:
+        AWS_REGION: us-east-2
