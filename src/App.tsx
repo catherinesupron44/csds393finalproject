@@ -1,59 +1,43 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
-import AuthModal from './components/AuthModal.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import Bets from './pages/Bets.jsx';
-import Profile from './pages/Profile.jsx';
-import Landing from './pages/Landing.jsx';
-import { useState } from 'react';
-import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
-import { signIn } from 'aws-amplify/auth';
-import './amplifyconfiguration.json';
-import MyMarkets from './pages/Markets.jsx';
+import Footer from './components/Footer.tsx'
+import Work from './pages/Work.tsx';
+import Home from './pages/Home.tsx';
+import Contact from './pages/Contact.tsx';
+import About from './pages/About.tsx';
+import Disclaimer from './pages/Disclaimer.jsx';
+import Privacy from './pages/Privacy.jsx';
+import Terms from './pages/Terms.jsx';
+import NakedChemistry from './pages/NakedChemistry.jsx';
+import OhioSkincare from "./pages/OhioSkincare.jsx";
 
 function App() {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-  const handleLogin = async (email: string, password: string) => {
-    try {
-      await signIn({ username: email, password });
-      setIsAuthModalOpen(false);
-    } catch (error) {
-      console.error('Error signing in:', error);
-      // Handle error (show error message, etc.)
-    }
-  };
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100">
+      <div className="min-h-screen bg-[#F1F2EB]">
         <Navbar />
         
         <Routes>
           {/* Public routes */}
-          <Route path="/login" element={<Landing onGetStarted={() => setIsAuthModalOpen(true)} />} />
-          <Route 
-            path="/" 
-            element={<Landing onGetStarted={() => setIsAuthModalOpen(true)} />}
-          />
+          <Route path="/work" element={<Work />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
 
-          {/* Protected routes */}
-          <Route element={<ProtectedRoutes />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/bets" element={<Bets />} />
-            <Route path="/markets" element={<MyMarkets />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
 
+          <Route path="/naked-chemistry-nov24" element={<NakedChemistry />} />
+          <Route path="/ohio-skincare-dec24" element={<OhioSkincare />} />
+
+          <Route path="/" element={<Home />} />
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
-        <AuthModal 
-          isOpen={isAuthModalOpen} 
-          onClose={() => setIsAuthModalOpen(false)}
-          onLogin={handleLogin}
-        />
+        <Footer />
       </div>
     </Router>
   );
